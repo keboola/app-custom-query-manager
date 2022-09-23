@@ -16,8 +16,15 @@ class ConfigDefinition extends BaseConfigDefinition
         /** @noinspection NullPointerExceptionInspection */
         $parametersNode
             ->children()
-                ->scalarNode('foo')
-                    ->defaultValue('baz')
+                ->enumNode('backendType')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                    ->values(Component::BACKENDS)
+                ->end()
+                ->enumNode('operation')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                    ->values(Component::OPERATIONS)
                 ->end()
             ->end()
         ;
