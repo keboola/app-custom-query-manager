@@ -1,10 +1,32 @@
-# my-component
+# Custom Query manager component
 
-> Fill in description
+Generates templates for Custom Query feature in Keboola Connection platform.
 
 # Usage
 
-> fill in usage instructions
+Create configuration in `data/config.json` with:
+- `parameters`:
+    - `backendType`: one of supported backend (e.g. `snowflake`); required
+    - `operation`: one of supported operation (e.g. `tableCreate`); required
+- `action`: one of supported sync action to be run - `generate`; required
+
+for example:
+```json
+{
+  "parameters": {
+    "backendType": "snowflake",
+    "operation": "tableCreate"
+  },
+  "action": "generate"
+}
+```
+
+Run component:
+```shell
+docker-compose run --rm dev
+```
+
+Will return JSON with query template.
 
 ## Development
  
