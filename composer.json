@@ -3,7 +3,8 @@
     "description": "MyComponent description",
     "license": "MIT",
     "require": {
-        "php": "^8.1",
+        "php": "^7.4",
+        "keboola/db-import-export": "dev-mj-update-php-temp as 1.9.1",
         "keboola/php-component": "^9.0"
     },
     "require-dev": {

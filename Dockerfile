@@ -1,4 +1,4 @@
-FROM php:8-cli
+FROM php:7.4-cli
 
 ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ARG DEBIAN_FRONTEND=noninteractive
@@ -14,10 +14,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         locales \
         unzip \
+        unixodbc-dev \
 	&& rm -r /var/lib/apt/lists/* \
 	&& sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
-	&& locale-gen \
-	&& chmod +x /tmp/composer-install.sh \
+	&& locale-gen
+
+# ODBC
+RUN set -x \
+    && docker-php-source extract \
+    && cd /usr/src/php/ext/odbc \
+    && phpize \
+    && sed -ri 's@^ *test +"\$PHP_.*" *= *"no" *&& *PHP_.*=yes *$@#&@g' configure \
+    && ./configure --with-unixODBC=shared,/usr \
+    && docker-php-ext-install odbc \
+    && docker-php-source delete
+
+RUN chmod +x /tmp/composer-install.sh \
 	&& /tmp/composer-install.sh
 
 ENV LANGUAGE=en_US.UTF-8
