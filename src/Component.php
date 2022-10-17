@@ -10,22 +10,6 @@ use MyComponent\SyncAction\GenerateAction;
 
 class Component extends BaseComponent
 {
-    // supported backends
-    public const BACKEND_SNOWFLAKE = 'snowflake';
-    public const BACKEND_SYNAPSE = 'synapse';
-    public const BACKENDS = [
-        self::BACKEND_SNOWFLAKE,
-        self::BACKEND_SYNAPSE,
-    ];
-
-    // operation for generate action
-    public const OPERATION_TABLE_CREATE = 'tableCreate';
-    public const OPERATION_TABLE_DROP = 'tableDrop';
-    public const OPERATIONS = [
-        self::OPERATION_TABLE_CREATE,
-        self::OPERATION_TABLE_DROP,
-    ];
-
     protected function run(): void
     {
         throw new UserException(sprintf(
