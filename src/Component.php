@@ -6,12 +6,10 @@ namespace MyComponent;
 
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
-use Psr\Log\LoggerInterface;
+use MyComponent\SyncAction\GenerateAction;
 
 class Component extends BaseComponent
 {
-    public const ACTION_GENERATE = 'generate';
-
     // supported backends
     public const BACKEND_SNOWFLAKE = 'snowflake';
     public const BACKEND_SYNAPSE = 'synapse';
@@ -28,16 +26,11 @@ class Component extends BaseComponent
         self::OPERATION_TABLE_DROP,
     ];
 
-    public function __construct(LoggerInterface $logger)
-    {
-        parent::__construct($logger);
-    }
-
     protected function run(): void
     {
         throw new UserException(sprintf(
             'Can be used only for sync actions {%s}.',
-            implode(',', [self::ACTION_GENERATE])
+            implode(',', [GenerateAction::NAME])
         ));
     }
 
@@ -49,16 +42,9 @@ class Component extends BaseComponent
         /** @var Config $config */
         $config = $this->getConfig();
 
-        // TODO use import-export-lib
-
-        return [
-            'action' => self::ACTION_GENERATE,
-            'backendType' => $config->getBackendType(),
-            'operation' => $config->getOperation(),
-            'output' => [
-                'foo' => 'bar',
-            ],
-        ];
+        return (new GenerateAction(
+            $config,
+        ))->run();
     }
 
     protected function getConfigClass(): string
@@ -77,7 +63,7 @@ class Component extends BaseComponent
     public function getSyncActions(): array
     {
         return [
-            self::ACTION_GENERATE => 'actionGenerate',
+            GenerateAction::NAME => 'actionGenerate',
         ];
     }
 }
