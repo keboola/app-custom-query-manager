@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MyComponent;
+namespace Keboola\CustomQueryManagerApp;
 
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
-use MyComponent\SyncAction\GenerateAction;
+use Keboola\CustomQueryManagerApp\SyncAction\GenerateAction;
 
 class Component extends BaseComponent
 {

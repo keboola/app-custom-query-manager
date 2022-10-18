@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyComponent\FunctionalTests;
+namespace Keboola\CustomQueryManagerApp\FunctionalTests;
 
 use Keboola\DatadirTests\DatadirTestCase;
 

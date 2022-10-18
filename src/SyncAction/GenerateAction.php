@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MyComponent\SyncAction;
+namespace Keboola\CustomQueryManagerApp\SyncAction;
 
-use MyComponent\Config;
+use Keboola\CustomQueryManagerApp\Config;
 
 class GenerateAction
 {

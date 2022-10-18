@@ -1,6 +1,6 @@
 {
-    "name": "keboola/my-component",
-    "description": "MyComponent description",
+    "name": "keboola/app-custom-query-manager",
+    "description": "Application to generate SQL queries",
     "license": "MIT",
     "require": {
         "php": "^7.4",
@@ -18,13 +18,13 @@
     },
     "autoload": {
         "psr-4": {
-            "MyComponent\\": "src/"
+            "Keboola\\CustomQueryManagerApp\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MyComponent\\Tests\\": "tests/phpunit/",
-            "MyComponent\\FunctionalTests\\": "tests/functional/"
+            "Keboola\\CustomQueryManagerApp\\Tests\\": "tests/phpunit/",
+            "Keboola\\CustomQueryManagerApp\\FunctionalTests\\": "tests/functional/"
         }
     },
     "scripts": {
