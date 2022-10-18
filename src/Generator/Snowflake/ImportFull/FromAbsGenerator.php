@@ -13,6 +13,7 @@ use Keboola\Db\ImportExport\Storage;
 use Keboola\TableBackendUtils\Column\ColumnCollection;
 use Keboola\TableBackendUtils\Column\ColumnInterface;
 use Keboola\TableBackendUtils\Column\Snowflake\SnowflakeColumn;
+use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
 use Keboola\TableBackendUtils\Table\Snowflake\SnowflakeTableDefinition;
 use Keboola\TableBackendUtils\Table\Snowflake\SnowflakeTableQueryBuilder;
 use PHPUnit\Framework\TestCase;
@@ -169,7 +170,7 @@ class FromAbsGenerator extends TestCase
         $replacedQueries = [];
         dump('=== queries');
         foreach ($queries as $query) {
-            $replacedQuery = Utils::replaceParamsInQuery($query, $params);
+            $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SnowflakeQuote());
             $replacedQueries[] = $replacedQuery;
             dump($replacedQuery);
             dump('---------');

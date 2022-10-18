@@ -3,6 +3,7 @@
 namespace Keboola\CustomQueryManagerApp\Tests\Generator;
 
 use Keboola\CustomQueryManagerApp\Generator\Utils;
+use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
 use PHPUnit\Framework\TestCase;
 
 class UtilsTest extends TestCase
@@ -29,7 +30,7 @@ class UtilsTest extends TestCase
             ],
         ];
 
-        $output = Utils::replaceParamsInQuery($input, $params);
+        $output = Utils::replaceParamsInQuery($input, $params, new SnowflakeQuote());
 
         $expected = /** @lang Snowflake */ <<<SQL
             COPY INTO {{ id(stageSchemaName) }}.{{ id(stageTableName) }}
@@ -50,6 +51,7 @@ class UtilsTest extends TestCase
             $input,
             $value,
             $key,
+            new SnowflakeQuote(),
             $prefix,
             $suffix,
         );

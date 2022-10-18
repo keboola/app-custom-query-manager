@@ -3,7 +3,7 @@
 namespace Keboola\CustomQueryManagerApp\Generator;
 
 use Keboola\TableBackendUtils\Column\ColumnInterface;
-use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
+use Keboola\TableBackendUtils\Escaping\QuoteInterface;
 
 class Utils
 {
@@ -13,6 +13,7 @@ class Utils
     public static function replaceParamsInQuery(
         string $query,
         array $params,
+        QuoteInterface $quoter,
         string $outputPrefix = '{{ ',
         string $outputSuffix = ' }}'
     ): string {
@@ -20,13 +21,13 @@ class Utils
             if (is_array($value)) {
                 foreach ($value as $keyInArray => $valueInArray) {
                     if ($valueInArray instanceof ColumnInterface) {
-                        $query = self::replaceParamInQuery($query, $valueInArray->getColumnName(), $keyInArray, $outputPrefix, $outputSuffix);
+                        $query = self::replaceParamInQuery($query, $valueInArray->getColumnName(), $keyInArray, $quoter, $outputPrefix, $outputSuffix);
                     } else {
-                        $query = self::replaceParamInQuery($query, $valueInArray, $keyInArray, $outputPrefix, $outputSuffix);
+                        $query = self::replaceParamInQuery($query, $valueInArray, $keyInArray, $quoter, $outputPrefix, $outputSuffix);
                     }
                 }
             } else {
-                $query = self::replaceParamInQuery($query, $value, $key, $outputPrefix, $outputSuffix);
+                $query = self::replaceParamInQuery($query, $value, $key, $quoter, $outputPrefix, $outputSuffix);
             }
         }
         return $query;
@@ -36,24 +37,25 @@ class Utils
         string $query,
         string $valueInQuery,
         string $keyInOutput,
+        QuoteInterface $quoter,
         string $outputPrefix = '{{ ',
         string $outputSuffix = ' }}'
     ): string {
         if (strpos($keyInOutput, '#') === 0) {
             // replace values
-            $valueInQuery = SnowflakeQuote::quote($valueInQuery);
+            $valueInQuery = $quoter::quote($valueInQuery);
             $keyInOutput = substr($keyInOutput, 1);
         } elseif (strpos($keyInOutput, '/') === 0) {
             // replace generated identifiers
             $matches = [];
             if (preg_match('/\b(' . $valueInQuery . '\w+)\b/', $query, $matches) === 1) {
-                $valueInQuery = SnowflakeQuote::quoteSingleIdentifier($matches[1]);
+                $valueInQuery = $quoter::quoteSingleIdentifier($matches[1]);
                 $keyInOutput = substr($keyInOutput, 1);
                 $keyInOutput = sprintf('id(%s)', $keyInOutput);
             }
         } else {
             // replace identifiers
-            $valueInQuery = SnowflakeQuote::quoteSingleIdentifier($valueInQuery);
+            $valueInQuery = $quoter::quoteSingleIdentifier($valueInQuery);
             $keyInOutput = sprintf('id(%s)', $keyInOutput);
         }
         return str_replace(
