@@ -19,7 +19,7 @@ class Component extends BaseComponent
     }
 
     /**
-     * @return array{action: string, backendType: string, operation: string, output: mixed[]}
+     * @return array<string, string|array>
      */
     public function actionGenerate(): array
     {
