@@ -24,6 +24,8 @@ class GenerateAction
      */
     public function run(): array
     {
+        $queries = [];
+
         if ($this->config->getBackend() === Config::BACKEND_SNOWFLAKE) {
             if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL_FROM_FILE) {
                 if ($this->config->getSource() === Config::SOURCE_FILE_ABS) {
@@ -32,14 +34,22 @@ class GenerateAction
                         $this->config->getColumns(),
                         $this->config->getPrimaryKeys(),
                     );
-                } else {
-                    throw new UserException('Source not implemented yet');
                 }
-            } else {
-                throw new UserException('Operation not implemented yet');
             }
-        } else {
-            throw new UserException('Backend not implemented yet');
+        } elseif ($this->config->getBackend() === Config::BACKEND_SYNAPSE) {
+            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL_FROM_FILE) {
+                if ($this->config->getSource() === Config::SOURCE_FILE_ABS) {
+                    $generator = new Generator\Synapse\ImportFull\FromAbsGenerator();
+                    $queries = $generator->generate(
+                        $this->config->getColumns(),
+                        $this->config->getPrimaryKeys(),
+                    );
+                }
+            }
+        }
+
+        if (empty($queries)) {
+            throw new UserException('Combination of Backend/Operation/Source not implemented yet');
         }
 
         return [
