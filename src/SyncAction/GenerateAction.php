@@ -26,8 +26,11 @@ class GenerateAction
 
         return [
             'action' => self::NAME,
-            'backendType' => $this->config->getBackendType(),
+            'backendType' => $this->config->getBackend(),
             'operation' => $this->config->getOperation(),
+            'columns' => $this->config->getColumns(),
+            'primaryKeys' => $this->config->getPrimaryKeys(),
+            'source' => $this->config->getSource(),
             'output' => [
                 'foo' => 'bar',
             ],

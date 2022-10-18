@@ -24,13 +24,42 @@ class Config extends BaseConfig
         self::OPERATION_TABLE_DROP,
     ];
 
-    public function getBackendType(): string
+    // supported sources
+    public const SOURCE_FILE_ABS = 'fileAbs';
+    public const SOURCE_TABLE = 'table';
+    public const SOURCES = [
+        self::SOURCE_FILE_ABS,
+        self::SOURCE_TABLE,
+    ];
+
+    public function getBackend(): string
     {
-        return $this->getStringValue(['parameters', 'backendType']);
+        return $this->getStringValue(['parameters', 'backend']);
     }
 
     public function getOperation(): string
     {
         return $this->getStringValue(['parameters', 'operation']);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumns(): array
+    {
+        return $this->getArrayValue(['parameters', 'columns']);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPrimaryKeys(): array
+    {
+        return $this->getArrayValue(['parameters', 'primaryKeys']);
+    }
+
+    public function getSource(): string
+    {
+        return $this->getStringValue(['parameters', 'source']);
     }
 }
