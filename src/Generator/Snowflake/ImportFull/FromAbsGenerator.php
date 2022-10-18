@@ -5,6 +5,7 @@ namespace Keboola\CustomQueryManagerApp\Generator\Snowflake\ImportFull;
 use Doctrine\DBAL\Connection;
 use Keboola\CsvOptions\CsvOptions;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
+use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Snowflake;
 use Keboola\Db\ImportExport\Backend\Snowflake\SnowflakeImportOptions;
 use Keboola\Db\ImportExport\Backend\Snowflake\ToFinalTable\FullImporter;
@@ -27,15 +28,28 @@ class FromAbsGenerator extends TestCase
      */
     public function generate(array $columns, array $primaryKeys = []): array
     {
-        // TODO use given columns and primaryKeys
-
         // 'foo'  = identifier
         // '#foo' = value
         // '/foo' = identifier with prefix in value - need to be found first in query
-        $sourceCol1Name = Utils::getUniqeId('sourceColumn1');
-        $sourceCol2Name = Utils::getUniqeId('sourceColumn2');
-        $destCol1Name = Utils::getUniqeId('destColumn1');
-        $destCol2Name = Utils::getUniqeId('destColumn2');
+
+        $sourceColumns = $columns;
+
+        $stageColumns = [];
+        foreach ($columns as $columnName) {
+            $stageColumns[] = new SnowflakeColumn(
+                $columnName,
+                new Snowflake(Snowflake::getTypeByBasetype(BaseType::STRING))
+            );
+        }
+        $stagePrimaryKeys = $primaryKeys;
+
+        $destColumns = $stageColumns;
+        $destColumns[] = new SnowflakeColumn(
+            ColumnInterface::TIMESTAMP_COLUMN_NAME,
+            new Snowflake(Snowflake::getTypeByBasetype(BaseType::TIMESTAMP))
+        );
+        $destPrimaryKeys = $primaryKeys;
+
         $params = [
             'sourceFiles' => [
                 '#sourceFile1' => Utils::getUniqeId('sourceFile1'),
@@ -45,50 +59,12 @@ class FromAbsGenerator extends TestCase
 
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
-            'stageColumns' => [
-                'sourceColumn1' => new SnowflakeColumn(
-                    $sourceCol1Name,
-                    new Snowflake(Snowflake::TYPE_INT)
-                ),
-                'sourceColumn2' => new SnowflakeColumn(
-                    $sourceCol2Name,
-                    new Snowflake(Snowflake::TYPE_VARCHAR)
-                ),
-            ],
-            'stagePrimaryKeys' => [],
-//            'stagePrimaryKeys' => [
-//                'sourceCol1' => $sourceCol1Name,
-//            ],
             // dedup table (prefix)
             '/stageDeduplicationTableName' => '__temp_DEDUP_',
 
             'destSchemaName' => Utils::getUniqeId('destSchemaName'),
             'destTableName' => Utils::getUniqeId('destTableName'),
-            'destColumns' => [
-                'destCol1' => new SnowflakeColumn(
-                    $destCol1Name,
-                    new Snowflake(Snowflake::TYPE_INT)
-                ),
-                'destCol2' => new SnowflakeColumn(
-                    $destCol2Name,
-                    new Snowflake(Snowflake::TYPE_VARCHAR)
-                ),
-                'destColTimestamp' => new SnowflakeColumn(
-                    Utils::getUniqeId('_timestamp'),
-                    new Snowflake(Snowflake::TYPE_TIMESTAMP)
-                ),
-            ],
-            'destPrimaryKeys' => [],
-//            'destPrimaryKeys' => [
-//                'destPrimaryKey1' => $destCol1Name,
-//            ],
         ];
-
-        $sourceColumnsNames = [];
-        /** @var ColumnInterface $column */
-        foreach ($params['stageColumns'] as $column) {
-            $sourceColumnsNames[] = $column->getColumnName();
-        }
 
         $queries = [];
 
@@ -105,7 +81,7 @@ class FromAbsGenerator extends TestCase
         $source = $this->createMock(Storage\ABS\SourceFile::class);
         $source->expects(self::atLeastOnce())->method('getCsvOptions')->willReturn(new CsvOptions());
         $source->expects(self::atLeastOnce())->method('getManifestEntries')->willReturn($params['sourceFiles']);
-        $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumnsNames);
+        $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
         // ABS specific
         $source->expects(self::atLeastOnce())->method('getContainerUrl')->willReturn($params['#sourceContainerUrl']);
         $source->expects(self::atLeastOnce())->method('getSasToken')->willReturn($params['#sourceSasToken']);
@@ -115,8 +91,8 @@ class FromAbsGenerator extends TestCase
             $params['stageSchemaName'],
             $params['stageTableName'],
             true,
-            new ColumnCollection($params['stageColumns']),
-            $params['stagePrimaryKeys']
+            new ColumnCollection($stageColumns),
+            $stagePrimaryKeys
         );
         // fake options
         $options = new SnowflakeImportOptions(
@@ -130,8 +106,8 @@ class FromAbsGenerator extends TestCase
             $params['destSchemaName'],
             $params['destTableName'],
             false,
-            new ColumnCollection($params['destColumns']),
-            $params['destPrimaryKeys']
+            new ColumnCollection($destColumns),
+            $destPrimaryKeys
         );
 
         // mock importer
@@ -170,6 +146,8 @@ class FromAbsGenerator extends TestCase
         $replacedQueries = [];
         dump('=== queries');
         foreach ($queries as $query) {
+//            dump($query);
+//            dump('---');
             $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SnowflakeQuote());
             $replacedQueries[] = $replacedQuery;
             dump($replacedQuery);
