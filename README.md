@@ -6,16 +6,27 @@ Generates templates for Custom Query feature in Keboola Connection platform.
 
 Create configuration in `data/config.json` with:
 - `parameters`:
-    - `backendType`: one of supported backend (e.g. `snowflake`); required
-    - `operation`: one of supported operation (e.g. `tableCreate`); required
-- `action`: one of supported sync action to be run - `generate`; required
+    - `backend`: one of supported backend: `synapse`, `snowflake`; required
+    - `operation`: one of supported operation: `importFull`, `importIncremental`; required
+    - `source`: one of supported operation: `table`, `fileAbs`; required
+    - `columns`: list of columns; required
+    - `primaryKeys`: list of primary keys; optional
+- `action`: one of supported sync action to be run: `generate`; required
 
 for example:
 ```json
 {
   "parameters": {
-    "backendType": "snowflake",
-    "operation": "tableCreate"
+    "backend": "synapse",
+    "operation": "importFull",
+    "source": "fileAbs",
+    "columns": [
+      "column1",
+      "column2"
+    ],
+    "primaryKeys": [
+      "column1"
+    ]
   },
   "action": "generate"
 }
@@ -26,15 +37,15 @@ Run component:
 docker-compose run --rm dev
 ```
 
-Will return JSON with query template.
+Will return JSON with query templates.
 
 ## Development
  
 Clone this repository and init the workspace with following command:
 
 ```
-git clone https://github.com/keboola/my-component
-cd my-component
+git clone https://github.com/keboola/component.app-custom-query-manager
+cd component.app-custom-query-manager
 docker-compose build
 docker-compose run --rm dev composer install --no-scripts
 ```
