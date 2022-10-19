@@ -12,6 +12,7 @@ class Utils
      *   - 'foo'  = identifier
      *   - '#foo' = value
      *   - '^foo' = identifier with prefix in value
+     *   - '$foo' = identifier with suffix in value
      *
      * @param mixed[] $params
      */
@@ -61,12 +62,23 @@ class Utils
                 // not found, return original query
                 return $query;
             }
+        } elseif (strpos($keyInOutput, '$') === 0) {
+            // replace generated identifiers at the end
+            $matches = [];
+            if (preg_match('/\b(\w+' . $valueInQuery . ')\b/', $query, $matches) === 1) {
+                $valueInQuery = $quoter::quoteSingleIdentifier($matches[1]);
+                $keyInOutput = substr($keyInOutput, 1);
+                $keyInOutput = sprintf('id(%s)', $keyInOutput);
+            } else {
+                // not found, return original query
+                return $query;
             }
         } else {
             // replace identifiers
             $valueInQuery = $quoter::quoteSingleIdentifier($valueInQuery);
             $keyInOutput = sprintf('id(%s)', $keyInOutput);
         }
+
         return str_replace(
             $valueInQuery,
             sprintf(

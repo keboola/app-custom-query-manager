@@ -29,10 +29,6 @@ class FromTableGenerator extends TestCase
      */
     public function generate(array $columns, array $primaryKeys = []): array
     {
-        // TODO replace dedup table (sufix):
-        //   CREATE TABLE {{ id(destSchemaName) }}.[destTableName634ec2b2aaa54129985850tmp634ec2b2c31150_96482587_tmp]
-        //   RENAME OBJECT {{ id(destSchemaName) }}.{{ id(destTableName) }} TO [destTableName634ec2b2aaa54129985850tmp634ec2b2c31150_96482587_tmp_rename]
-
         $sourceColumns = $columns;
         $sourcePrimaryKeys = $primaryKeys;
 
@@ -58,8 +54,9 @@ class FromTableGenerator extends TestCase
 
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
-            // dedup table (prefix)
-            '^stageDeduplicationTableName' => '__temp_DEDUP_',
+            // dedup table (suffix)
+            '$stageDeduplicationTableName' => '_tmp',
+            '$stageDeduplicationRenameTableName' => '_tmp_rename',
 
             'destSchemaName' => Utils::getUniqeId('destSchemaName'),
             'destTableName' => Utils::getUniqeId('destTableName'),

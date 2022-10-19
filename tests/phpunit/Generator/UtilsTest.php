@@ -3,7 +3,9 @@
 namespace Keboola\CustomQueryManagerApp\Tests\Generator;
 
 use Keboola\CustomQueryManagerApp\Generator\Utils;
+use Keboola\TableBackendUtils\Escaping\QuoteInterface;
 use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
+use Keboola\TableBackendUtils\Escaping\SynapseQuote;
 use PHPUnit\Framework\TestCase;
 
 class UtilsTest extends TestCase
@@ -45,13 +47,13 @@ class UtilsTest extends TestCase
     /**
      * @dataProvider replaceParamInQueryProvider
      */
-    public function testReplaceParamInQuery(string $input, string $key, string $value, ?string $prefix, ?string $suffix, string $expectedOutput): void
+    public function testReplaceParamInQuery(string $input, string $key, string $value, QuoteInterface $quoter, ?string $prefix, ?string $suffix, string $expectedOutput): void
     {
         $output = Utils::replaceParamInQuery(
             $input,
             $value,
             $key,
-            new SnowflakeQuote(),
+            $quoter,
             $prefix,
             $suffix,
         );
@@ -70,11 +72,22 @@ class UtilsTest extends TestCase
             FROM 'sourceContainerUrl6336ebdee0b80'
         SQL;
 
+        $dedupQuerySynapse = <<<SQL
+            CREATE TABLE [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp]
+            WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+        SQL;
+
+        $dedupQueryWithRenameSynapse = <<<SQL
+            CREATE TABLE [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp_rename]
+            WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+        SQL;
+
         return [
             'test id' => [
                 $defaultQuery,
                 'keyInOutput' => 'stageSchemaName',
                 'valueInQuery' => 'stageSchemaName6336e8dda7606',
+                new SnowflakeQuote(),
                 '{{ ',
                 ' }}',
                 'output' => <<<SQL
@@ -86,6 +99,7 @@ class UtilsTest extends TestCase
                 $defaultQuery,
                 '#sourceContainerUrl',
                 'sourceContainerUrl6336ebdee0b80',
+                new SnowflakeQuote(),
                 '{{ ',
                 ' }}',
                 <<<SQL
@@ -97,6 +111,7 @@ class UtilsTest extends TestCase
                 $defaultQuery,
                 'stageSchemaName',
                 'stageSchemaName6336e8dda7606',
+                new SnowflakeQuote(),
                 '[',
                 ']',
                 <<<SQL
@@ -108,6 +123,7 @@ class UtilsTest extends TestCase
                 $defaultQuery,
                 '#sourceContainerUrl',
                 'sourceContainerUrl6336ebdee0b80',
+                new SnowflakeQuote(),
                 '[',
                 ']',
                 <<<SQL
@@ -119,11 +135,48 @@ class UtilsTest extends TestCase
                 $dedupQuerySnowflake,
                 '^stageDeduplicationTableName',
                 '__temp_DEDUP_',
+                new SnowflakeQuote(),
                 '{{ ',
                 ' }}',
                 <<<SQL
                     COPY INTO "stageSchemaName6336e8dda7606".{{ id(stageDeduplicationTableName) }}
                     FROM 'sourceContainerUrl6336ebdee0b80'
+                SQL,
+            ],
+            'test generated id at the end - synapse' => [
+                $dedupQuerySynapse,
+                '$destDeduplicationTableName',
+                '_tmp',
+                new SynapseQuote(),
+                '{{ ',
+                ' }}',
+                <<<SQL
+                    CREATE TABLE [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
+                    WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+                SQL,
+            ],
+            'test generated id at the end - not found - synapse' => [
+                $dedupQueryWithRenameSynapse,
+                '$destDeduplicationTableName',
+                '_tmp',
+                new SynapseQuote(),
+                '{{ ',
+                ' }}',
+                <<<SQL
+                    CREATE TABLE [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp_rename]
+                    WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+                SQL,
+            ],
+            'test generated id at the end with rename - synapse' => [
+                $dedupQueryWithRenameSynapse,
+                '$destDeduplicationTableName',
+                '_tmp_rename',
+                new SynapseQuote(),
+                '{{ ',
+                ' }}',
+                <<<SQL
+                    CREATE TABLE [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
+                    WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
                 SQL,
             ],
         ];

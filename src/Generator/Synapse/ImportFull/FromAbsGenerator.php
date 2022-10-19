@@ -32,9 +32,6 @@ class FromAbsGenerator extends TestCase
     {
         // TODO replace SECRET ($sourceSasToken):
         //   CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET='?sourceSasToken634ec2b2aaa4f608157197'),
-        // TODO replace dedup table (sufix):
-        //   CREATE TABLE {{ id(destSchemaName) }}.[destTableName634ec2b2aaa54129985850tmp634ec2b2c31150_96482587_tmp]
-        //   RENAME OBJECT {{ id(destSchemaName) }}.{{ id(destTableName) }} TO [destTableName634ec2b2aaa54129985850tmp634ec2b2c31150_96482587_tmp_rename]
 
         $sourceColumns = $columns;
 
@@ -63,8 +60,9 @@ class FromAbsGenerator extends TestCase
 
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
-            // dedup table (prefix)
-            '^stageDeduplicationTableName' => '__temp_DEDUP_',
+            // dedup table (suffix)
+            '$stageDeduplicationTableName' => '_tmp',
+            '$stageDeduplicationRenameTableName' => '_tmp_rename',
 
             'destSchemaName' => Utils::getUniqeId('destSchemaName'),
             'destTableName' => Utils::getUniqeId('destTableName'),
