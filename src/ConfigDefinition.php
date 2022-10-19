@@ -13,7 +13,6 @@ class ConfigDefinition extends BaseConfigDefinition
     {
         $parametersNode = parent::getParametersDefinition();
         // @formatter:off
-        /** @noinspection NullPointerExceptionInspection */
         $parametersNode
             ->children()
                 ->enumNode('backend')

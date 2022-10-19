@@ -16,7 +16,7 @@ class Utils
      *   - '^foo' = identifier with prefix in value
      *   - '$foo' = identifier with suffix in value
      *
-     * @param mixed[] $params
+     * @param array<string, string|array<string, string|ColumnInterface>> $params
      */
     public static function replaceParamsInQuery(
         string $query,

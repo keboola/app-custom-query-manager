@@ -60,8 +60,8 @@ class UtilsTest extends TestCase
         string $key,
         string $value,
         QuoteInterface $quoter,
-        ?string $prefix,
-        ?string $suffix,
+        string $prefix,
+        string $suffix,
         string $expectedOutput
     ): void {
         $output = Utils::replaceParamInQuery(
@@ -75,10 +75,7 @@ class UtilsTest extends TestCase
         $this->assertSame($expectedOutput, $output);
     }
 
-    /**
-     * @return string[]
-     */
-    public function replaceParamInQueryProvider(): array
+    public function replaceParamInQueryProvider(): \Generator
     {
         $defaultQuery = <<<SQL
             COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
@@ -108,121 +105,119 @@ class UtilsTest extends TestCase
             WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET='?sourceSasToken634ff46baec58062943542') )
         SQL;
 
-        return [
-            'test id' => [
-                $defaultQuery,
-                'stageSchemaName',
-                'stageSchemaName6336e8dda7606',
-                new SnowflakeQuote(),
-                '{{ ',
-                ' }}',
-                'output' => <<<SQL
-                    COPY INTO {{ id(stageSchemaName) }}."stageTableName6336e8dda7607"
-                    FROM 'sourceContainerUrl6336ebdee0b80'
-                SQL,
-            ],
-            'test value' => [
-                $defaultQuery,
-                '#sourceContainerUrl',
-                'sourceContainerUrl6336ebdee0b80',
-                new SnowflakeQuote(),
-                '{{ ',
-                ' }}',
-                <<<SQL
-                    COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
-                    FROM {{ sourceContainerUrl }}
-                SQL,
-            ],
-            'test id with other prefix+suffix' => [
-                $defaultQuery,
-                'stageSchemaName',
-                'stageSchemaName6336e8dda7606',
-                new SnowflakeQuote(),
-                '[',
-                ']',
-                <<<SQL
-                    COPY INTO [id(stageSchemaName)]."stageTableName6336e8dda7607"
-                    FROM 'sourceContainerUrl6336ebdee0b80'
-                SQL,
-            ],
-            'test value with other prefix+suffix' => [
-                $defaultQuery,
-                '#sourceContainerUrl',
-                'sourceContainerUrl6336ebdee0b80',
-                new SnowflakeQuote(),
-                '[',
-                ']',
-                <<<SQL
-                    COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
-                    FROM [sourceContainerUrl]
-                SQL,
-            ],
-            'test generated id at the beginning' => [
-                $dedupQuerySnowflake,
-                '^stageDeduplicationTableName',
-                '__temp_DEDUP_',
-                new SnowflakeQuote(),
-                '{{ ',
-                ' }}',
-                <<<SQL
-                    COPY INTO "stageSchemaName6336e8dda7606".{{ id(stageDeduplicationTableName) }}
-                    FROM 'sourceContainerUrl6336ebdee0b80'
-                SQL,
-            ],
-            'test generated id at the end - synapse' => [
-                $dedupQuerySynapse,
-                '$destDeduplicationTableName',
-                '_tmp',
-                new SynapseQuote(),
-                '{{ ',
-                ' }}',
-                <<<SQL
-                    CREATE TABLE
-                        [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
-                    WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
-                SQL,
-            ],
-            'test generated id at the end - not found - synapse' => [
-                $dedupQueryWithRenameSynapse,
-                '$destDeduplicationTableName',
-                '_tmp',
-                new SynapseQuote(),
-                '{{ ',
-                ' }}',
-                <<<SQL
-                    CREATE TABLE
-                        [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_tmp_rename]
-                    WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
-                SQL,
-            ],
-            'test generated id at the end with rename - synapse' => [
-                $dedupQueryWithRenameSynapse,
-                '$destDeduplicationTableName',
-                '_tmp_rename',
-                new SynapseQuote(),
-                '{{ ',
-                ' }}',
-                <<<SQL
-                    CREATE TABLE
-                        [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
-                    WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
-                SQL,
-            ],
-            'test prefixed value produces Twig syntax - synapse' => [
-                $defaultQueryWithSecretSynapse,
-                // '#' means value + Twig syntax
-                '#\'?\' ~ sourceSasSecret',
-                // prefixed by '?'
-                '?sourceSasToken634ff46baec58062943542',
-                new SynapseQuote(),
-                '{{ ',
-                ' }}',
-                <<<SQL
-                    COPY INTO [stageSchemaName634ff46baec71046847136].[__temp_stageTableName634ff46baec72821993597]
-                    FROM 'sourceFile1634ff46baec6c521446965'
-                    WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET={{ '?' ~ sourceSasSecret }}) )
-                SQL,
-            ],
+        yield 'test id' => [
+            $defaultQuery,
+            'stageSchemaName',
+            'stageSchemaName6336e8dda7606',
+            new SnowflakeQuote(),
+            '{{ ',
+            ' }}',
+            'output' => <<<SQL
+                COPY INTO {{ id(stageSchemaName) }}."stageTableName6336e8dda7607"
+                FROM 'sourceContainerUrl6336ebdee0b80'
+            SQL,
+        ];
+        yield 'test value' => [
+            $defaultQuery,
+            '#sourceContainerUrl',
+            'sourceContainerUrl6336ebdee0b80',
+            new SnowflakeQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
+                FROM {{ sourceContainerUrl }}
+            SQL,
+        ];
+        yield 'test id with other prefix+suffix' => [
+            $defaultQuery,
+            'stageSchemaName',
+            'stageSchemaName6336e8dda7606',
+            new SnowflakeQuote(),
+            '[',
+            ']',
+            <<<SQL
+                COPY INTO [id(stageSchemaName)]."stageTableName6336e8dda7607"
+                FROM 'sourceContainerUrl6336ebdee0b80'
+            SQL,
+        ];
+        yield 'test value with other prefix+suffix' => [
+            $defaultQuery,
+            '#sourceContainerUrl',
+            'sourceContainerUrl6336ebdee0b80',
+            new SnowflakeQuote(),
+            '[',
+            ']',
+            <<<SQL
+                COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
+                FROM [sourceContainerUrl]
+            SQL,
+        ];
+        yield 'test generated id at the beginning' => [
+            $dedupQuerySnowflake,
+            '^stageDeduplicationTableName',
+            '__temp_DEDUP_',
+            new SnowflakeQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                COPY INTO "stageSchemaName6336e8dda7606".{{ id(stageDeduplicationTableName) }}
+                FROM 'sourceContainerUrl6336ebdee0b80'
+            SQL,
+        ];
+        yield 'test generated id at the end - synapse' => [
+            $dedupQuerySynapse,
+            '$destDeduplicationTableName',
+            '_tmp',
+            new SynapseQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                CREATE TABLE
+                    [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
+                WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+            SQL,
+        ];
+        yield 'test generated id at the end - not found - synapse' => [
+            $dedupQueryWithRenameSynapse,
+            '$destDeduplicationTableName',
+            '_tmp',
+            new SynapseQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                CREATE TABLE
+                    [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_tmp_rename]
+                WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+            SQL,
+        ];
+        yield 'test generated id at the end with rename - synapse' => [
+            $dedupQueryWithRenameSynapse,
+            '$destDeduplicationTableName',
+            '_tmp_rename',
+            new SynapseQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                CREATE TABLE
+                    [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
+                WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+            SQL,
+        ];
+        yield 'test prefixed value produces Twig syntax - synapse' => [
+            $defaultQueryWithSecretSynapse,
+            // '#' means value + Twig syntax
+            '#\'?\' ~ sourceSasSecret',
+            // prefixed by '?'
+            '?sourceSasToken634ff46baec58062943542',
+            new SynapseQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                COPY INTO [stageSchemaName634ff46baec71046847136].[__temp_stageTableName634ff46baec72821993597]
+                FROM 'sourceFile1634ff46baec6c521446965'
+                WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET={{ '?' ~ sourceSasSecret }}) )
+            SQL,
         ];
     }
 

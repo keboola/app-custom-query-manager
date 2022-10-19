@@ -15,6 +15,7 @@ class ConfigDefinitionTest extends TestCase
 {
     /**
      * @dataProvider provideInvalidConfigs
+     * @param class-string<\Throwable> $expectedExceptionClass
      */
     public function testInvalidConfigDefinition(
         string $inputConfig,

@@ -19,7 +19,9 @@ class Component extends BaseComponent
     }
 
     /**
-     * @return array<string, string|array>
+     * @codingStandardsIgnoreStart
+     * @return array{action: string, backendType: string, operation: string, columns: string[], primaryKeys: string[], source: string, output: array{queries: array{sql: string, description: string}[]}}
+     * @codingStandardsIgnoreEnd
      */
     public function actionGenerate(): array
     {
