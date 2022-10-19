@@ -27,7 +27,7 @@ class GenerateAction
         $queries = [];
 
         if ($this->config->getBackend() === Config::BACKEND_SNOWFLAKE) {
-            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL_FROM_FILE) {
+            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL) {
                 if ($this->config->getSource() === Config::SOURCE_FILE_ABS) {
                     $generator = new Generator\Snowflake\ImportFull\FromAbsGenerator();
                     $queries = $generator->generate(
@@ -37,7 +37,7 @@ class GenerateAction
                 }
             }
         } elseif ($this->config->getBackend() === Config::BACKEND_SYNAPSE) {
-            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL_FROM_FILE) {
+            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL) {
                 if ($this->config->getSource() === Config::SOURCE_FILE_ABS) {
                     $generator = new Generator\Synapse\ImportFull\FromAbsGenerator();
                     $queries = $generator->generate(
@@ -45,7 +45,6 @@ class GenerateAction
                         $this->config->getPrimaryKeys(),
                     );
                 }
-            } elseif ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL_FROM_TABLE) {
                 if ($this->config->getSource() === Config::SOURCE_TABLE) {
                     $generator = new Generator\Synapse\ImportFull\FromTableGenerator();
                     $queries = $generator->generate(

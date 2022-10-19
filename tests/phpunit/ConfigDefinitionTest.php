@@ -58,7 +58,7 @@ class ConfigDefinitionTest extends TestCase
                 }
                 JSON,
                 InvalidConfigurationException::class,
-                'The value "" is not allowed for path "root.parameters.operation". Permissible values: "importFullFromFile", "importFullFromTable"',
+                'The value "" is not allowed for path "root.parameters.operation". Permissible values: "importFull", "importIncremental"',
             ],
             // TODO backend
             // TODO source
@@ -72,7 +72,7 @@ class ConfigDefinitionTest extends TestCase
         $inputs = <<<JSON
         {
             "parameters": {
-                "operation": "importFullFromFile",
+                "operation": "importFull",
                 "backend": "snowflake",
                 "source": "fileAbs",
                 "columns": [
@@ -89,15 +89,15 @@ class ConfigDefinitionTest extends TestCase
         $processedConfig = (new Processor())->processConfiguration(new ConfigDefinition(), [$config]);
         self::assertSame([
             'parameters' => [
-                'operation' => 'importFullFromFile',
+                'operation' => 'importFull',
                 'backend' => 'snowflake',
                 'source' => 'fileAbs',
                 'columns' => [
-                    'aaa',
-                    'bbb'
+                    'col1',
+                    'col2'
                 ],
                 'primaryKeys' => [
-                    'aaa'
+                    'col1'
                 ],
             ],
         ], $processedConfig);

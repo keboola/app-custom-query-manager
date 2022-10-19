@@ -17,11 +17,11 @@ class Config extends BaseConfig
     ];
 
     // operation for generate action
-    public const OPERATION_IMPORT_FULL_FROM_FILE = 'importFullFromFile';
-    public const OPERATION_IMPORT_FULL_FROM_TABLE = 'importFullFromTable';
+    public const OPERATION_IMPORT_FULL = 'importFull';
+    public const OPERATION_IMPORT_INCREMENTAL = 'importIncremental';
     public const OPERATIONS = [
-        self::OPERATION_IMPORT_FULL_FROM_FILE,
-        self::OPERATION_IMPORT_FULL_FROM_TABLE,
+        self::OPERATION_IMPORT_FULL,
+        self::OPERATION_IMPORT_INCREMENTAL,
     ];
 
     // supported sources
