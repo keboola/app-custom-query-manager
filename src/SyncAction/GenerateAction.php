@@ -67,8 +67,24 @@ class GenerateAction
             'primaryKeys' => $this->config->getPrimaryKeys(),
             'source' => $this->config->getSource(),
             'output' => [
-                'queries' => $queries,
+                'queries' => $this->formatQueriesForOutput($queries),
             ],
         ];
+    }
+
+    /**
+     * @param string[] $queries
+     * @return array{sql: string, description: string}[]
+     */
+    private function formatQueriesForOutput(array $queries): array
+    {
+        $output = [];
+        foreach ($queries as $query) {
+            $output[] = [
+                'sql' => $query,
+                'description' => '',
+            ];
+        }
+        return $output;
     }
 }
