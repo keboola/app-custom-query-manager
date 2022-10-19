@@ -45,6 +45,14 @@ class GenerateAction
                         $this->config->getPrimaryKeys(),
                     );
                 }
+            } elseif ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL_FROM_TABLE) {
+                if ($this->config->getSource() === Config::SOURCE_TABLE) {
+                    $generator = new Generator\Synapse\ImportFull\FromTableGenerator();
+                    $queries = $generator->generate(
+                        $this->config->getColumns(),
+                        $this->config->getPrimaryKeys(),
+                    );
+                }
             }
         }
 
