@@ -65,7 +65,7 @@ class UtilsTest extends TestCase
             FROM 'sourceContainerUrl6336ebdee0b80'
         SQL;
 
-        $dedupQuery = <<<SQL
+        $dedupQuerySnowflake = <<<SQL
             COPY INTO "stageSchemaName6336e8dda7606"."__temp_DEDUP_csvimport6336e8dda7607"
             FROM 'sourceContainerUrl6336ebdee0b80'
         SQL;
@@ -115,9 +115,9 @@ class UtilsTest extends TestCase
                     FROM [sourceContainerUrl]
                 SQL
             ],
-            'test generated id' => [
-                $dedupQuery,
-                '/stageDeduplicationTableName',
+            'test generated id at the beginning' => [
+                $dedupQuerySnowflake,
+                '^stageDeduplicationTableName',
                 '__temp_DEDUP_',
                 '{{ ',
                 ' }}',

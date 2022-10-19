@@ -8,6 +8,11 @@ use Keboola\TableBackendUtils\Escaping\QuoteInterface;
 class Utils
 {
     /**
+     * Keys in `$params` can specify their purpose:
+     *   - 'foo'  = identifier
+     *   - '#foo' = value
+     *   - '^foo' = identifier with prefix in value
+     *
      * @param mixed[] $params
      */
     public static function replaceParamsInQuery(
@@ -45,13 +50,17 @@ class Utils
             // replace values
             $valueInQuery = $quoter::quote($valueInQuery);
             $keyInOutput = substr($keyInOutput, 1);
-        } elseif (strpos($keyInOutput, '/') === 0) {
-            // replace generated identifiers
+        } elseif (strpos($keyInOutput, '^') === 0) {
+            // replace generated identifiers at the beginning
             $matches = [];
             if (preg_match('/\b(' . $valueInQuery . '\w+)\b/', $query, $matches) === 1) {
                 $valueInQuery = $quoter::quoteSingleIdentifier($matches[1]);
                 $keyInOutput = substr($keyInOutput, 1);
                 $keyInOutput = sprintf('id(%s)', $keyInOutput);
+            } else {
+                // not found, return original query
+                return $query;
+            }
             }
         } else {
             // replace identifiers

@@ -28,10 +28,6 @@ class FromAbsGenerator extends TestCase
      */
     public function generate(array $columns, array $primaryKeys = []): array
     {
-        // 'foo'  = identifier
-        // '#foo' = value
-        // '/foo' = identifier with prefix in value - need to be found first in query
-
         $sourceColumns = $columns;
 
         $stageColumns = [];
@@ -60,7 +56,7 @@ class FromAbsGenerator extends TestCase
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
             // dedup table (prefix)
-            '/stageDeduplicationTableName' => '__temp_DEDUP_',
+            '^stageDeduplicationTableName' => '__temp_DEDUP_',
 
             'destSchemaName' => Utils::getUniqeId('destSchemaName'),
             'destTableName' => Utils::getUniqeId('destTableName'),
