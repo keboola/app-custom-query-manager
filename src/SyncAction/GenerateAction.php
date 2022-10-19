@@ -21,7 +21,7 @@ class GenerateAction
 
     /**
      * @codingStandardsIgnoreStart
-     * @return array{action: string, backendType: string, operation: string, columns: string[], primaryKeys: string[], source: string, output: array{queries: array{sql: string, description: string}[]}}
+     * @return array{action: string, backend: string, operation: string, columns: string[], primaryKeys: string[], source: string, output: array{queries: array{sql: string, description: string}[]}}
      * @codingStandardsIgnoreEnd
      */
     public function run(): array
@@ -63,11 +63,11 @@ class GenerateAction
 
         return [
             'action' => self::NAME,
-            'backendType' => $this->config->getBackend(),
+            'backend' => $this->config->getBackend(),
             'operation' => $this->config->getOperation(),
+            'source' => $this->config->getSource(),
             'columns' => $this->config->getColumns(),
             'primaryKeys' => $this->config->getPrimaryKeys(),
-            'source' => $this->config->getSource(),
             'output' => [
                 'queries' => $this->formatQueriesForOutput($queries),
             ],
