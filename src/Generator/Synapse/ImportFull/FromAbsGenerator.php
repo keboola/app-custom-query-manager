@@ -145,11 +145,6 @@ class FromAbsGenerator extends TestCase
             $qb->getCreateTableCommandFromDefinition($stagingTable)
         );
 
-        // ACTION: create final table
-        $conn->executeStatement(
-            $qb->getCreateTableCommandFromDefinition($destination)
-        );
-
         // ACTION: import to stage table
         $importState = $importer->importToStagingTable(
             $source,
