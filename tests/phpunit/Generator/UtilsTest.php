@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\CustomQueryManagerApp\Tests\Generator;
 
+use Generator;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\TableBackendUtils\Escaping\QuoteInterface;
 use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
@@ -75,7 +76,7 @@ class UtilsTest extends TestCase
         $this->assertSame($expectedOutput, $output);
     }
 
-    public function replaceParamInQueryProvider(): \Generator
+    public function replaceParamInQueryProvider(): Generator
     {
         $defaultQuery = <<<SQL
             COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
