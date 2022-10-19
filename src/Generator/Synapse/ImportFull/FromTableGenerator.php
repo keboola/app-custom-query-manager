@@ -152,14 +152,14 @@ class FromTableGenerator extends TestCase
 
         // result
         $replacedQueries = [];
-        dump('=== queries');
+        file_put_contents('php://stderr', '=== queries:' . PHP_EOL, FILE_APPEND);
         foreach ($queries as $query) {
-//            dump($query);
-//            dump('---');
+//            file_put_contents('php://stderr', $query . PHP_EOL, FILE_APPEND);
+//            file_put_contents('php://stderr', '---' . PHP_EOL, FILE_APPEND);
             $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SynapseQuote());
             $replacedQueries[] = $replacedQuery;
-            dump($replacedQuery);
-            dump('---------');
+            file_put_contents('php://stderr', $replacedQuery . PHP_EOL, FILE_APPEND);
+            file_put_contents('php://stderr', '---------' . PHP_EOL, FILE_APPEND);
         }
 
         return $replacedQueries;
