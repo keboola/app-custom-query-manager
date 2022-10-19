@@ -82,6 +82,12 @@ class UtilsTest extends TestCase
             WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
         SQL;
 
+        $defaultQueryWithSecretSynapse = <<<SQL
+            COPY INTO [stageSchemaName634ff46baec71046847136].[__temp_stageTableName634ff46baec72821993597]
+            FROM 'sourceFile1634ff46baec6c521446965'
+            WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET='?sourceSasToken634ff46baec58062943542') )
+        SQL;
+
         return [
             'test id' => [
                 $defaultQuery,
@@ -177,6 +183,21 @@ class UtilsTest extends TestCase
                 <<<SQL
                     CREATE TABLE [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
                     WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+                SQL,
+            ],
+            'test prefixed value produces Twig syntax - synapse' => [
+                $defaultQueryWithSecretSynapse,
+                // '#' means value + Twig syntax
+                '#\'?\' ~ sourceSasSecret',
+                // prefixed by '?'
+                '?sourceSasToken634ff46baec58062943542',
+                new SynapseQuote(),
+                '{{ ',
+                ' }}',
+                <<<SQL
+                    COPY INTO [stageSchemaName634ff46baec71046847136].[__temp_stageTableName634ff46baec72821993597]
+                    FROM 'sourceFile1634ff46baec6c521446965'
+                    WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET={{ '?' ~ sourceSasSecret }}) )
                 SQL,
             ],
         ];

@@ -30,9 +30,6 @@ class FromAbsGenerator extends TestCase
      */
     public function generate(array $columns, array $primaryKeys = []): array
     {
-        // TODO replace SECRET ($sourceSasToken):
-        //   CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET='?sourceSasToken634ec2b2aaa4f608157197'),
-
         $sourceColumns = $columns;
 
         $stageColumns = [];
@@ -51,12 +48,16 @@ class FromAbsGenerator extends TestCase
         );
         $destPrimaryKeys = $primaryKeys;
 
+        $sourceSasToken = Utils::getUniqeId('sourceSasToken');
+
         $params = [
             'sourceFiles' => [
                 '#sourceFile1' => Utils::getUniqeId('sourceFile1'),
             ],
             '#sourceContainerUrl' => Utils::getUniqeId('sourceContainerUrl'),
-            '#sourceSasToken' => Utils::getUniqeId('sourceSasToken'),
+            '#sourceSasToken' => $sourceSasToken,
+            // generated sql contains different value (prefixed) -> key contains Twig format
+            '#\'?\' ~ sourceSasToken' => sprintf('?%s', $sourceSasToken),
 
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
