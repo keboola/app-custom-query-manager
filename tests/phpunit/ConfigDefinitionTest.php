@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\CustomQueryManagerApp\Tests;
 
 use Keboola\CustomQueryManagerApp\ConfigDefinition;
@@ -58,7 +60,8 @@ class ConfigDefinitionTest extends TestCase
                 }
                 JSON,
                 InvalidConfigurationException::class,
-                'The value "" is not allowed for path "root.parameters.operation". Permissible values: "importFull", "importIncremental"',
+                'The value "" is not allowed for path "root.parameters.operation". ' .
+                'Permissible values: "importFull", "importIncremental"',
             ],
             // TODO backend
             // TODO source
@@ -94,10 +97,10 @@ class ConfigDefinitionTest extends TestCase
                 'source' => 'fileAbs',
                 'columns' => [
                     'col1',
-                    'col2'
+                    'col2',
                 ],
                 'primaryKeys' => [
-                    'col1'
+                    'col1',
                 ],
             ],
         ], $processedConfig);

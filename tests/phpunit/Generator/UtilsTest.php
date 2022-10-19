@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\CustomQueryManagerApp\Tests\Generator;
 
 use Keboola\CustomQueryManagerApp\Generator\Utils;
@@ -11,13 +13,16 @@ use PHPUnit\Framework\TestCase;
 class UtilsTest extends TestCase
 {
 
-    public function testReplaceParamsInQuery()
+    public function testReplaceParamsInQuery(): void
     {
         $input = /** @lang Snowflake */ <<<SQL
             COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
             FROM 'sourceContainerUrl6336ebdee0b80'
             CREDENTIALS=(AZURE_SAS_TOKEN='sourceSasToken6336ebdee0b81')
-            FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ',' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '\"' ESCAPE_UNENCLOSED_FIELD = NONE)
+            FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ','
+                SKIP_HEADER = 1
+                FIELD_OPTIONALLY_ENCLOSED_BY = '\"'
+                ESCAPE_UNENCLOSED_FIELD = NONE)
             FILES = ('sourceFile16336ebdee0b7f')
         SQL;
         $params = [
@@ -38,7 +43,10 @@ class UtilsTest extends TestCase
             COPY INTO {{ id(stageSchemaName) }}.{{ id(stageTableName) }}
             FROM {{ sourceContainerUrl }}
             CREDENTIALS=(AZURE_SAS_TOKEN={{ sourceSasToken }})
-            FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ',' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '\"' ESCAPE_UNENCLOSED_FIELD = NONE)
+            FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ','
+                SKIP_HEADER = 1
+                FIELD_OPTIONALLY_ENCLOSED_BY = '\"'
+                ESCAPE_UNENCLOSED_FIELD = NONE)
             FILES = ({{ sourceFile1 }})
         SQL;
         $this->assertSame($expected, $output);
@@ -47,8 +55,15 @@ class UtilsTest extends TestCase
     /**
      * @dataProvider replaceParamInQueryProvider
      */
-    public function testReplaceParamInQuery(string $input, string $key, string $value, QuoteInterface $quoter, ?string $prefix, ?string $suffix, string $expectedOutput): void
-    {
+    public function testReplaceParamInQuery(
+        string $input,
+        string $key,
+        string $value,
+        QuoteInterface $quoter,
+        ?string $prefix,
+        ?string $suffix,
+        string $expectedOutput
+    ): void {
         $output = Utils::replaceParamInQuery(
             $input,
             $value,
@@ -60,6 +75,9 @@ class UtilsTest extends TestCase
         $this->assertSame($expectedOutput, $output);
     }
 
+    /**
+     * @return string[]
+     */
     public function replaceParamInQueryProvider(): array
     {
         $defaultQuery = <<<SQL
@@ -73,12 +91,14 @@ class UtilsTest extends TestCase
         SQL;
 
         $dedupQuerySynapse = <<<SQL
-            CREATE TABLE [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp]
+            CREATE TABLE
+                [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp]
             WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
         SQL;
 
         $dedupQueryWithRenameSynapse = <<<SQL
-            CREATE TABLE [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp_rename]
+            CREATE TABLE
+                [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_tmp_rename]
             WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
         SQL;
 
@@ -91,8 +111,8 @@ class UtilsTest extends TestCase
         return [
             'test id' => [
                 $defaultQuery,
-                'keyInOutput' => 'stageSchemaName',
-                'valueInQuery' => 'stageSchemaName6336e8dda7606',
+                'stageSchemaName',
+                'stageSchemaName6336e8dda7606',
                 new SnowflakeQuote(),
                 '{{ ',
                 ' }}',
@@ -123,7 +143,7 @@ class UtilsTest extends TestCase
                 <<<SQL
                     COPY INTO [id(stageSchemaName)]."stageTableName6336e8dda7607"
                     FROM 'sourceContainerUrl6336ebdee0b80'
-                SQL
+                SQL,
             ],
             'test value with other prefix+suffix' => [
                 $defaultQuery,
@@ -135,7 +155,7 @@ class UtilsTest extends TestCase
                 <<<SQL
                     COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
                     FROM [sourceContainerUrl]
-                SQL
+                SQL,
             ],
             'test generated id at the beginning' => [
                 $dedupQuerySnowflake,
@@ -157,7 +177,8 @@ class UtilsTest extends TestCase
                 '{{ ',
                 ' }}',
                 <<<SQL
-                    CREATE TABLE [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
+                    CREATE TABLE
+                        [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
                     WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
                 SQL,
             ],
@@ -169,7 +190,8 @@ class UtilsTest extends TestCase
                 '{{ ',
                 ' }}',
                 <<<SQL
-                    CREATE TABLE [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_17122540_tmp_rename]
+                    CREATE TABLE
+                        [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_tmp_rename]
                     WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
                 SQL,
             ],
@@ -181,7 +203,8 @@ class UtilsTest extends TestCase
                 '{{ ',
                 ' }}',
                 <<<SQL
-                    CREATE TABLE [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
+                    CREATE TABLE
+                        [destSchemaName6336e8dda7606].{{ id(destDeduplicationTableName) }}
                     WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
                 SQL,
             ],
@@ -203,7 +226,7 @@ class UtilsTest extends TestCase
         ];
     }
 
-    public function testGetUniqeId()
+    public function testGetUniqeId(): void
     {
         $id = Utils::getUniqeId('somePrefix');
         $this->assertStringNotContainsString('.', $id);

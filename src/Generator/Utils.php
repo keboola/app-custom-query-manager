@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\CustomQueryManagerApp\Generator;
 
 use Keboola\TableBackendUtils\Column\ColumnInterface;
@@ -27,13 +29,34 @@ class Utils
             if (is_array($value)) {
                 foreach ($value as $keyInArray => $valueInArray) {
                     if ($valueInArray instanceof ColumnInterface) {
-                        $query = self::replaceParamInQuery($query, $valueInArray->getColumnName(), $keyInArray, $quoter, $outputPrefix, $outputSuffix);
+                        $query = self::replaceParamInQuery(
+                            $query,
+                            $valueInArray->getColumnName(),
+                            $keyInArray,
+                            $quoter,
+                            $outputPrefix,
+                            $outputSuffix
+                        );
                     } else {
-                        $query = self::replaceParamInQuery($query, $valueInArray, $keyInArray, $quoter, $outputPrefix, $outputSuffix);
+                        $query = self::replaceParamInQuery(
+                            $query,
+                            $valueInArray,
+                            $keyInArray,
+                            $quoter,
+                            $outputPrefix,
+                            $outputSuffix
+                        );
                     }
                 }
             } else {
-                $query = self::replaceParamInQuery($query, $value, $key, $quoter, $outputPrefix, $outputSuffix);
+                $query = self::replaceParamInQuery(
+                    $query,
+                    $value,
+                    $key,
+                    $quoter,
+                    $outputPrefix,
+                    $outputSuffix
+                );
             }
         }
         return $query;

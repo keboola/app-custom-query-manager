@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\CustomQueryManagerApp\Generator\Snowflake\ImportFull;
 
 use Doctrine\DBAL\Connection;
