@@ -102,11 +102,11 @@ class FromAbsGenerator extends TestCase
             new ColumnCollection($stageColumns),
             $stagePrimaryKeys,
             new TableDistributionDefinition(
-                TableDistributionDefinition::TABLE_DISTRIBUTION_HASH,
+                TableDistributionDefinition::TABLE_DISTRIBUTION_ROUND_ROBIN,
                 $stagePrimaryKeys
             ),
             new TableIndexDefinition(
-                TableIndexDefinition::TABLE_INDEX_TYPE_HEAP,
+                TableIndexDefinition::TABLE_INDEX_TYPE_CLUSTERED_COLUMNSTORE_INDEX,
                 $stagePrimaryKeys
             )
         );
@@ -125,11 +125,11 @@ class FromAbsGenerator extends TestCase
             new ColumnCollection($destColumns),
             $destPrimaryKeys,
             new TableDistributionDefinition(
-                TableDistributionDefinition::TABLE_DISTRIBUTION_HASH,
+                TableDistributionDefinition::TABLE_DISTRIBUTION_ROUND_ROBIN,
                 $destPrimaryKeys
             ),
             new TableIndexDefinition(
-                TableIndexDefinition::TABLE_INDEX_TYPE_HEAP,
+                TableIndexDefinition::TABLE_INDEX_TYPE_CLUSTERED_COLUMNSTORE_INDEX,
                 $destPrimaryKeys
             )
         );
