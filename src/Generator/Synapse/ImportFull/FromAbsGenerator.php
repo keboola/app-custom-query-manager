@@ -62,8 +62,8 @@ class FromAbsGenerator extends TestCase
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
             // dedup table (suffix)
-            '$stageDeduplicationTableName' => '_tmp',
-            '$stageDeduplicationRenameTableName' => '_tmp_rename',
+            '$stageTableName ~ \'_tmp\'' => '_tmp',
+            '$stageTableName ~ \'_tmp_rename\'' => '_tmp_rename',
 
             'destSchemaName' => Utils::getUniqeId('destSchemaName'),
             'destTableName' => Utils::getUniqeId('destTableName'),
