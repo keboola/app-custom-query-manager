@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\CustomQueryManagerApp\FunctionalTests;
 
+use Generator;
 use Keboola\DatadirTests\AbstractDatadirTestCase;
 use Keboola\DatadirTests\DatadirTestSpecification;
 use Keboola\DatadirTests\Exception\DatadirTestsException;
@@ -13,8 +14,14 @@ use function GuzzleHttp\json_encode;
 
 class ComponentTest extends AbstractDatadirTestCase
 {
-    public function testGenerateSynapseFullImportTable(): void
-    {
+    /**
+     * @dataProvider generateActionProvider
+     */
+    public function testGenerateAction(
+        string $backend,
+        string $operation,
+        string $source
+    ): void {
         $specification = new DatadirTestSpecification(
             __DIR__,
             0,
@@ -26,9 +33,9 @@ class ComponentTest extends AbstractDatadirTestCase
         $data = [
             'action' => 'generate',
             'parameters' => [
-                'backend' => 'synapse',
-                'operation' => 'importFull',
-                'source' => 'table',
+                'backend' => $backend,
+                'operation' => $operation,
+                'source' => $source,
                 'columns' => [
                     'column1',
                     'column2',
@@ -66,8 +73,81 @@ class ComponentTest extends AbstractDatadirTestCase
         self::assertIsString($queries[0]['sql']);
         self::assertArrayHasKey('description', $queries[0]);
         self::assertIsString($queries[0]['description']);
+    }
 
+    public function generateActionProvider(): Generator
+    {
+        yield 'synapse-importFull-table' => [
+            'synapse',
+            'importFull',
+            'table',
+        ];
+        yield 'synapse-importFull-fileAbs' => [
+            'synapse',
+            'importFull',
+            'fileAbs',
+        ];
+        yield 'snowflake-importFull-fileAbs' => [
+            'snowflake',
+            'importFull',
+            'fileAbs',
+        ];
+    }
+
+    /**
+     * @dataProvider generateActionFailedProvider
+     */
+    public function testGenerateActionFailed(
+        string $backend,
+        string $operation,
+        string $source,
+        string $expectedStderr
+    ): void {
+        $specification = new DatadirTestSpecification(
+            __DIR__,
+            1,
+            null,
+            $expectedStderr,
+            null
         );
+        $tempDatadir = $this->getTempDatadir($specification);
+        $data = [
+            'action' => 'generate',
+            'parameters' => [
+                'backend' => $backend,
+                'operation' => $operation,
+                'source' => $source,
+                'columns' => [
+                    'column1',
+                    'column2',
+                ],
+                'primaryKeys' => [
+                    'column1',
+                ],
+            ],
+        ];
+        file_put_contents($tempDatadir->getTmpFolder() . '/config.json', json_encode($data));
+
+        $process = $this->runScript($tempDatadir->getTmpFolder());
+        $this->assertMatchesSpecification($specification, $process, $tempDatadir->getTmpFolder());
+        $output = json_decode($process->getOutput(), true);
+    }
+
+    public function generateActionFailedProvider(): Generator
+    {
+        yield 'combination not implemented yet' => [
+            'snowflake',
+            'importIncremental',
+            'table',
+            'Combination of Backend/Operation/Source not implemented yet',
+        ];
+        yield 'invalid backend value' => [
+            'redshift',
+            'importFull',
+            'table',
+            'The value "redshift" is not allowed for path "root.parameters.backend".' .
+                ' Permissible values: "snowflake", "synapse"',
+        ];
     }
 
     protected function runScript(string $datadirPath, ?string $runId = null): Process
