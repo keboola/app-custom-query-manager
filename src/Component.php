@@ -6,6 +6,7 @@ namespace Keboola\CustomQueryManagerApp;
 
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
+use Keboola\CustomQueryManagerApp\Generator\GeneratorFactory;
 use Keboola\CustomQueryManagerApp\SyncAction\GenerateAction;
 
 class Component extends BaseComponent
@@ -29,6 +30,7 @@ class Component extends BaseComponent
         $config = $this->getConfig();
 
         return (new GenerateAction(
+            new GeneratorFactory(),
             $config,
         ))->run();
     }

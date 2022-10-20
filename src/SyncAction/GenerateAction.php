@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Keboola\CustomQueryManagerApp\SyncAction;
 
-use Keboola\Component\UserException;
 use Keboola\CustomQueryManagerApp\Config;
-use Keboola\CustomQueryManagerApp\Generator;
+use Keboola\CustomQueryManagerApp\Generator\GeneratorFactory;
 
 class GenerateAction
 {
     public const NAME = 'generate';
 
+    private GeneratorFactory $generatorFactory;
     private Config $config;
 
-    public function __construct(Config $config)
-    {
+    public function __construct(
+        GeneratorFactory $generatorFactory,
+        Config $config
+    ) {
+        $this->generatorFactory = $generatorFactory;
         $this->config = $config;
     }
 
@@ -26,40 +29,15 @@ class GenerateAction
      */
     public function run(): array
     {
-        $queries = [];
-
-        if ($this->config->getBackend() === Config::BACKEND_SNOWFLAKE) {
-            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL) {
-                if ($this->config->getSource() === Config::SOURCE_FILE_ABS) {
-                    $generator = new Generator\Snowflake\ImportFull\FromAbsGenerator();
-                    $queries = $generator->generate(
-                        $this->config->getColumns(),
-                        $this->config->getPrimaryKeys(),
-                    );
-                }
-            }
-        } elseif ($this->config->getBackend() === Config::BACKEND_SYNAPSE) {
-            if ($this->config->getOperation() === Config::OPERATION_IMPORT_FULL) {
-                if ($this->config->getSource() === Config::SOURCE_FILE_ABS) {
-                    $generator = new Generator\Synapse\ImportFull\FromAbsGenerator();
-                    $queries = $generator->generate(
-                        $this->config->getColumns(),
-                        $this->config->getPrimaryKeys(),
-                    );
-                }
-                if ($this->config->getSource() === Config::SOURCE_TABLE) {
-                    $generator = new Generator\Synapse\ImportFull\FromTableGenerator();
-                    $queries = $generator->generate(
-                        $this->config->getColumns(),
-                        $this->config->getPrimaryKeys(),
-                    );
-                }
-            }
-        }
-
-        if (empty($queries)) {
-            throw new UserException('Combination of Backend/Operation/Source not implemented yet');
-        }
+        $generator = $this->generatorFactory->factory(
+            $this->config->getBackend(),
+            $this->config->getOperation(),
+            $this->config->getSource(),
+        );
+        $queries = $generator->generate(
+            $this->config->getColumns(),
+            $this->config->getPrimaryKeys(),
+        );
 
         return [
             'action' => self::NAME,

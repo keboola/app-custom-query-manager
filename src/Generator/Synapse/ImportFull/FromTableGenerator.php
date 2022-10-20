@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull;
 
 use Doctrine\DBAL\Connection;
+use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Synapse;
@@ -22,7 +23,7 @@ use Keboola\TableBackendUtils\Table\SynapseTableDefinition;
 use Keboola\TableBackendUtils\Table\SynapseTableQueryBuilder;
 use PHPUnit\Framework\TestCase;
 
-class FromTableGenerator extends TestCase
+class FromTableGenerator extends TestCase implements GeneratorInterface
 {
     /**
      * @param string[] $columns

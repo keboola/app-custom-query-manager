@@ -32,14 +32,24 @@ class Config extends BaseConfig
         self::SOURCE_TABLE,
     ];
 
+    /**
+     * @return self::BACKEND_*
+     */
     public function getBackend(): string
     {
-        return $this->getStringValue(['parameters', 'backend']);
+        $value = $this->getStringValue(['parameters', 'backend']);
+        /** @var self::BACKEND_* $value */
+        return $value;
     }
 
+    /**
+     * @return self::OPERATION_*
+     */
     public function getOperation(): string
     {
-        return $this->getStringValue(['parameters', 'operation']);
+        $value = $this->getStringValue(['parameters', 'operation']);
+        /** @var self::OPERATION_* $value */
+        return $value;
     }
 
     /**
@@ -58,8 +68,13 @@ class Config extends BaseConfig
         return $this->getArrayValue(['parameters', 'primaryKeys']);
     }
 
+    /**
+     * @return self::SOURCE_*
+     */
     public function getSource(): string
     {
-        return $this->getStringValue(['parameters', 'source']);
+        $value = $this->getStringValue(['parameters', 'source']);
+        /** @var self::SOURCE_* $value */
+        return $value;
     }
 }

@@ -6,6 +6,7 @@ namespace Keboola\CustomQueryManagerApp\Generator\Snowflake\ImportFull;
 
 use Doctrine\DBAL\Connection;
 use Keboola\CsvOptions\CsvOptions;
+use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Snowflake;
@@ -21,7 +22,7 @@ use Keboola\TableBackendUtils\Table\Snowflake\SnowflakeTableDefinition;
 use Keboola\TableBackendUtils\Table\Snowflake\SnowflakeTableQueryBuilder;
 use PHPUnit\Framework\TestCase;
 
-class FromAbsGenerator extends TestCase
+class FromAbsGenerator extends TestCase implements GeneratorInterface
 {
     /**
      * @param string[] $columns

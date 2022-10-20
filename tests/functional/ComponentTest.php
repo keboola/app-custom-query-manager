@@ -52,17 +52,11 @@ class ComponentTest extends AbstractDatadirTestCase
         self::assertIsArray($output);
 
         self::assertArrayHasKey('action', $output);
-        self::assertSame('generate', $output['action']);
         self::assertArrayHasKey('backend', $output);
-        self::assertSame('synapse', $output['backend']);
         self::assertArrayHasKey('operation', $output);
-        self::assertSame('importFull', $output['operation']);
         self::assertArrayHasKey('source', $output);
-        self::assertSame('table', $output['source']);
         self::assertArrayHasKey('columns', $output);
-        self::assertSame(['column1', 'column2'], $output['columns']);
         self::assertArrayHasKey('primaryKeys', $output);
-        self::assertSame(['column1'], $output['primaryKeys']);
 
         self::assertArrayHasKey('output', $output);
         self::assertArrayHasKey('queries', $output['output']);
