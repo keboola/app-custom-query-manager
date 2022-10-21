@@ -51,16 +51,11 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         );
         $destPrimaryKeys = $primaryKeys;
 
-        $sourceSasToken = Utils::getUniqeId('sourceSasToken');
-
         $params = [
             'sourceFiles' => [
                 '#sourceFile1' => Utils::getUniqeId('sourceFile1'),
             ],
             '#sourceContainerUrl' => Utils::getUniqeId('sourceContainerUrl'),
-            '#sourceSasToken' => $sourceSasToken,
-            // generated sql contains different value (prefixed) -> key contains Twig format
-            '#\'?\' ~ sourceSasToken' => sprintf('?%s', $sourceSasToken),
 
             'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
             'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
@@ -90,7 +85,6 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
         // ABS specific
         $source->expects(self::atLeastOnce())->method('getContainerUrl')->willReturn($params['#sourceContainerUrl']);
-        $source->expects(self::atLeastOnce())->method('getSasToken')->willReturn($params['#sourceSasToken']);
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
@@ -113,7 +107,8 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             [],
             false,
             false,
-            1
+            1,
+            SynapseImportOptions::CREDENTIALS_MANAGED_IDENTITY,
         );
         // fake destination
         $destination = new SynapseTableDefinition(
