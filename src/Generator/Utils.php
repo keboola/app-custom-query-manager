@@ -11,10 +11,22 @@ class Utils
 {
     /**
      * Keys in `$params` can specify their purpose:
-     *   - 'foo'  = identifier
+     *   - 'foo'  = identifier:
+     *          `foo` => `randomName`
+     *          + `create table "randomName"`
+     *          = `create table {{ id(foo) }}`
      *   - '#foo' = value
+     *          `#foo` => `randomValue`
+     *          + `select 'randomValue' from "table"`
+     *          = `select {{ foo }} from table`
      *   - '^foo' = identifier with prefix in value
+     *          ^foo` => `__temp_import_`
+     *          + `create table "__temp_import_randomName"`
+     *          = `create table {{ id(foo) }}`
      *   - '$foo' = identifier with suffix in value
+     *          `$foo` => `_temp_import`
+     *          + `create table "randomName_temp_import"`
+     *          = `create table {{ id(foo) }}`
      *
      * @param array<string, string|array<string, string|ColumnInterface>> $params
      */
