@@ -27,13 +27,19 @@ class GeneratorFactory
                     return new Generator\Snowflake\ImportFull\FromAbsGenerator();
                 }
             }
-        } elseif ($backend === Config::BACKEND_SYNAPSE) {
+        }
+        if ($backend === Config::BACKEND_SYNAPSE) {
             if ($operation === Config::OPERATION_IMPORT_FULL) {
                 if ($source === Config::SOURCE_FILE_ABS) {
                     return new Generator\Synapse\ImportFull\FromAbsGenerator();
                 }
                 if ($source === Config::SOURCE_TABLE) {
                     return new Generator\Synapse\ImportFull\FromTableGenerator();
+                }
+            }
+            if ($operation === Config::OPERATION_IMPORT_INCREMENTAL) {
+                if ($source === Config::SOURCE_FILE_ABS) {
+                    return new Generator\Synapse\ImportIncremental\FromAbsGenerator();
                 }
             }
         }
