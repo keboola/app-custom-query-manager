@@ -47,7 +47,7 @@ Clone this repository and init the workspace with following command:
 git clone https://github.com/keboola/component.app-custom-query-manager
 cd component.app-custom-query-manager
 docker-compose build
-docker-compose run --rm dev composer install --no-scripts
+docker-compose run --rm dev composer install --ignore-platform-req=ext-odbc --no-scripts
 ```
 
 Run the test suite using this command:

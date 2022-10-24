@@ -1,6 +1,6 @@
 FROM php:7.4-cli
 
-ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
+ARG COMPOSER_FLAGS="--ignore-platform-req=ext-odbc --prefer-dist --no-interaction"
 ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_PROCESS_TIMEOUT 3600
@@ -14,20 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         locales \
         unzip \
-        unixodbc-dev \
 	&& rm -r /var/lib/apt/lists/* \
 	&& sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
 	&& locale-gen
-
-# ODBC
-RUN set -x \
-    && docker-php-source extract \
-    && cd /usr/src/php/ext/odbc \
-    && phpize \
-    && sed -ri 's@^ *test +"\$PHP_.*" *= *"no" *&& *PHP_.*=yes *$@#&@g' configure \
-    && ./configure --with-unixODBC=shared,/usr \
-    && docker-php-ext-install odbc \
-    && docker-php-source delete
 
 RUN chmod +x /tmp/composer-install.sh \
 	&& /tmp/composer-install.sh
