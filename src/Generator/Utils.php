@@ -89,7 +89,15 @@ class Utils
         } elseif (strpos($keyInOutput, '^') === 0) {
             // replace generated identifiers at the beginning
             $matches = [];
-            if (preg_match('/\b(' . $valueInQuery . '\w+)\b/', $query, $matches) === 1) {
+            if (preg_match('/^\w/', $valueInQuery) === 1) {
+                // the first character is any word char
+                $pregMatch = preg_match('/\b(' . $valueInQuery . '\w+)\b/', $query, $matches);
+            } else {
+                // the first character is non-word char
+                $quotingChars = preg_quote($quoter::quoteSingleIdentifier(''), '/');
+                $pregMatch = preg_match('/[' . $quotingChars . '](' . $valueInQuery . '\w+)\b/', $query, $matches);
+            }
+            if ($pregMatch === 1) {
                 $valueInQuery = $quoter::quoteSingleIdentifier($matches[1]);
                 $keyInOutput = substr($keyInOutput, 1);
                 $keyInOutput = sprintf('id(%s)', $keyInOutput);

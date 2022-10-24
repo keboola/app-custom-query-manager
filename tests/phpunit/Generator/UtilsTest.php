@@ -94,6 +94,13 @@ class UtilsTest extends TestCase
             WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
         SQL;
 
+        $incrementalDedupQuerySynapse = <<<SQL
+            CREATE TABLE
+                [stageSchemaName635693ea763e5831149645].[#__temp_csvimport635693ea996855_91441184]
+                    ([column1] NVARCHAR(4000), [column2] NVARCHAR(4000))
+                WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
+        SQL;
+
         $dedupQueryWithRenameSynapse = <<<SQL
             CREATE TABLE
                 [destSchemaName6336e8dda7606].[destTableName634fca7a22355200942535tmp634fca7a3eb402_tmp_rename]
@@ -164,6 +171,20 @@ class UtilsTest extends TestCase
             <<<SQL
                 COPY INTO "stageSchemaName6336e8dda7606".{{ id(stageDeduplicationTableName) }}
                 FROM 'sourceContainerUrl6336ebdee0b80'
+            SQL,
+        ];
+        yield 'test generated id at the beginning - synapse' => [
+            $incrementalDedupQuerySynapse,
+            '^stageDeduplicationTableName',
+            '#__temp_csvimport',
+            new SynapseQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                CREATE TABLE
+                    [stageSchemaName635693ea763e5831149645].{{ id(stageDeduplicationTableName) }}
+                        ([column1] NVARCHAR(4000), [column2] NVARCHAR(4000))
+                    WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)
             SQL,
         ];
         yield 'test generated id at the end - synapse' => [
