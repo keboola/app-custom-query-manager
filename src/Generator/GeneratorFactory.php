@@ -41,6 +41,9 @@ class GeneratorFactory
                 if ($source === Config::SOURCE_FILE_ABS) {
                     return new Generator\Synapse\ImportIncremental\FromAbsGenerator();
                 }
+                if ($source === Config::SOURCE_TABLE) {
+                    return new Generator\Synapse\ImportIncremental\FromTableGenerator();
+                }
             }
         }
         throw new UserException('Combination of Backend/Operation/Source not implemented yet');
