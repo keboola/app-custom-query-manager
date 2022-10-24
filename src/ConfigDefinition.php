@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyComponent;
+namespace Keboola\CustomQueryManagerApp;
 
 use Keboola\Component\Config\BaseConfigDefinition;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -13,11 +13,32 @@ class ConfigDefinition extends BaseConfigDefinition
     {
         $parametersNode = parent::getParametersDefinition();
         // @formatter:off
-        /** @noinspection NullPointerExceptionInspection */
         $parametersNode
             ->children()
-                ->scalarNode('foo')
-                    ->defaultValue('baz')
+                ->enumNode('backend')
+                    ->isRequired()
+                    ->values(Config::BACKENDS)
+                ->end()
+                ->enumNode('operation')
+                    ->isRequired()
+                    ->values(Config::OPERATIONS)
+                ->end()
+                ->arrayNode('columns')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->scalarPrototype()
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end()
+                ->arrayNode('primaryKeys')
+                    ->scalarPrototype()
+                        ->cannotBeEmpty()
+                    ->defaultValue([])
+                    ->end()
+                ->end()
+                ->enumNode('source')
+                    ->isRequired()
+                    ->values(Config::SOURCES)
                 ->end()
             ->end()
         ;

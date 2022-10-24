@@ -1,6 +1,6 @@
-FROM php:8-cli
+FROM php:7.4-cli
 
-ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
+ARG COMPOSER_FLAGS="--ignore-platform-req=ext-odbc --prefer-dist --no-interaction"
 ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_PROCESS_TIMEOUT 3600
@@ -16,8 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         unzip \
 	&& rm -r /var/lib/apt/lists/* \
 	&& sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
-	&& locale-gen \
-	&& chmod +x /tmp/composer-install.sh \
+	&& locale-gen
+
+RUN chmod +x /tmp/composer-install.sh \
 	&& /tmp/composer-install.sh
 
 ENV LANGUAGE=en_US.UTF-8
