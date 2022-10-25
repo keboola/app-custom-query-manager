@@ -35,7 +35,7 @@ class Replace
      *          + `create table "randomName_temp_import"`
      *          = `create table {{ id(foo) }}`
      *
-     * @param array<string, ReplaceToken|array<string, ReplaceToken>> $params
+     * @param array<string|int, ReplaceToken|array<string|int, ReplaceToken>> $params
      */
     public static function replaceParamsInQuery(
         string $query,

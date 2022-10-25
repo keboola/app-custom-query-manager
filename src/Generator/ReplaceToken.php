@@ -8,10 +8,10 @@ class ReplaceToken
 {
     private string $value;
     private string $replacement;
-    private string $type;
+    private int $type;
 
     /**
-     * @param Utils::TYPE_* $type
+     * @param Replace::TYPE_* $type
      */
     public function __construct(string $value, string $replacement, int $type = Replace::TYPE_MATCH_AS_IDENTIFIER)
     {
