@@ -26,7 +26,7 @@ class FromAbsGeneratorTest extends TestCase
         $expected = [
             "CREATE TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} ([column1] NVARCHAR(4000), [column2] NVARCHAR(4000)) WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)",
             "COPY INTO {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}
-FROM {{ sourceFile1 }}
+FROM {{ listFiles(sourceFiles) }}
 WITH (
     FILE_TYPE='CSV',
     CREDENTIAL=(IDENTITY='Managed Identity'),

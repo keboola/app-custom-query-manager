@@ -33,7 +33,7 @@ class FromAbsGeneratorTest extends TestCase
 FROM {{ sourceContainerUrl }}
 CREDENTIALS=(AZURE_SAS_TOKEN={{ sourceSasToken }})
 FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ',' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '\\\"' ESCAPE_UNENCLOSED_FIELD = NONE)
-FILES = ({{ sourceFile1 }})",
+FILES = ({{ listFiles(sourceFiles) }})",
             "CREATE TEMPORARY TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp_dedup') }}
 (
 \"column1\" VARCHAR,
