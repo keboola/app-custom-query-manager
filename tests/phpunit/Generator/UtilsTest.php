@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\CustomQueryManagerApp\Tests\Generator;
 
 use Generator;
+use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\TableBackendUtils\Escaping\QuoteInterface;
 use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
@@ -27,14 +28,32 @@ class UtilsTest extends TestCase
             FILES = ('sourceFile16336ebdee0b7f')
         SQL;
         $params = [
-            'stageSchemaName' => 'stageSchemaName6336e8dda7606',
-            '#sourceContainerUrl' => 'sourceContainerUrl6336ebdee0b80',
-            '#sourceSasToken' => 'sourceSasToken6336ebdee0b81',
+            'stageSchemaName' => new ReplaceToken(
+                'stageSchemaName6336e8dda7606',
+                'stageSchemaName',
+            ),
+            'sourceContainerUrl' => new ReplaceToken(
+                'sourceContainerUrl6336ebdee0b80',
+                'sourceContainerUrl',
+                Utils::TYPE_MATCH_AS_VALUE,
+            ),
+            'sourceSasToken' => new ReplaceToken(
+                'sourceSasToken6336ebdee0b81',
+                'sourceSasToken',
+                Utils::TYPE_MATCH_AS_VALUE,
+            ),
             'testIdInArray' => [
-                'stageTableName' => 'stageTableName6336e8dda7607',
+                new ReplaceToken(
+                    'stageTableName6336e8dda7607',
+                    'stageTableName',
+                ),
             ],
             'testValueInArray' => [
-                '#sourceFile1' => 'sourceFile16336ebdee0b7f',
+                new ReplaceToken(
+                    'sourceFile16336ebdee0b7f',
+                    'sourceFile1',
+                    Utils::TYPE_MATCH_AS_VALUE,
+                ),
             ],
         ];
 
@@ -58,8 +77,7 @@ class UtilsTest extends TestCase
      */
     public function testReplaceParamInQuery(
         string $input,
-        string $key,
-        string $value,
+        ReplaceToken $replaceToken,
         QuoteInterface $quoter,
         string $prefix,
         string $suffix,
@@ -67,8 +85,7 @@ class UtilsTest extends TestCase
     ): void {
         $output = Utils::replaceParamInQuery(
             $input,
-            $value,
-            $key,
+            $replaceToken,
             $quoter,
             $prefix,
             $suffix,
@@ -115,8 +132,10 @@ class UtilsTest extends TestCase
 
         yield 'test id' => [
             $defaultQuery,
-            'stageSchemaName',
-            'stageSchemaName6336e8dda7606',
+            new ReplaceToken(
+                'stageSchemaName6336e8dda7606',
+                'stageSchemaName',
+            ),
             new SnowflakeQuote(),
             '{{ ',
             ' }}',
@@ -127,8 +146,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test value' => [
             $defaultQuery,
-            '#sourceContainerUrl',
-            'sourceContainerUrl6336ebdee0b80',
+            new ReplaceToken(
+                'sourceContainerUrl6336ebdee0b80',
+                'sourceContainerUrl',
+                Utils::TYPE_MATCH_AS_VALUE,
+            ),
             new SnowflakeQuote(),
             '{{ ',
             ' }}',
@@ -139,8 +161,10 @@ class UtilsTest extends TestCase
         ];
         yield 'test id with other prefix+suffix' => [
             $defaultQuery,
-            'stageSchemaName',
-            'stageSchemaName6336e8dda7606',
+            new ReplaceToken(
+                'stageSchemaName6336e8dda7606',
+                'stageSchemaName',
+            ),
             new SnowflakeQuote(),
             '[',
             ']',
@@ -151,8 +175,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test value with other prefix+suffix' => [
             $defaultQuery,
-            '#sourceContainerUrl',
-            'sourceContainerUrl6336ebdee0b80',
+            new ReplaceToken(
+                'sourceContainerUrl6336ebdee0b80',
+                'sourceContainerUrl',
+                Utils::TYPE_MATCH_AS_VALUE,
+            ),
             new SnowflakeQuote(),
             '[',
             ']',
@@ -163,8 +190,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test generated id at the beginning' => [
             $dedupQuerySnowflake,
-            '^stageDeduplicationTableName',
-            '__temp_DEDUP_',
+            new ReplaceToken(
+                '__temp_DEDUP_',
+                'stageDeduplicationTableName',
+                Utils::TYPE_PREFIX_AS_IDENTIFIER,
+            ),
             new SnowflakeQuote(),
             '{{ ',
             ' }}',
@@ -175,8 +205,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test generated id at the beginning - synapse' => [
             $incrementalDedupQuerySynapse,
-            '^stageDeduplicationTableName',
-            '#__temp_csvimport',
+            new ReplaceToken(
+                '#__temp_csvimport',
+                'stageDeduplicationTableName',
+                Utils::TYPE_PREFIX_AS_IDENTIFIER,
+            ),
             new SynapseQuote(),
             '{{ ',
             ' }}',
@@ -189,8 +222,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test generated id at the end - synapse' => [
             $dedupQuerySynapse,
-            '$destDeduplicationTableName',
-            '_tmp',
+            new ReplaceToken(
+                '_tmp',
+                'destDeduplicationTableName',
+                Utils::TYPE_SUFFIX_AS_IDENTIFIER,
+            ),
             new SynapseQuote(),
             '{{ ',
             ' }}',
@@ -202,8 +238,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test generated id at the end - not found - synapse' => [
             $dedupQueryWithRenameSynapse,
-            '$destDeduplicationTableName',
-            '_tmp',
+            new ReplaceToken(
+                '_tmp',
+                'destDeduplicationTableName',
+                Utils::TYPE_SUFFIX_AS_IDENTIFIER,
+            ),
             new SynapseQuote(),
             '{{ ',
             ' }}',
@@ -215,8 +254,11 @@ class UtilsTest extends TestCase
         ];
         yield 'test generated id at the end with rename - synapse' => [
             $dedupQueryWithRenameSynapse,
-            '$destDeduplicationTableName',
-            '_tmp_rename',
+            new ReplaceToken(
+                '_tmp_rename',
+                'destDeduplicationTableName',
+                Utils::TYPE_SUFFIX_AS_IDENTIFIER,
+            ),
             new SynapseQuote(),
             '{{ ',
             ' }}',
@@ -228,10 +270,12 @@ class UtilsTest extends TestCase
         ];
         yield 'test prefixed value produces Twig syntax - synapse' => [
             $defaultQueryWithSecretSynapse,
-            // '#' means value + Twig syntax
-            '#\'?\' ~ sourceSasSecret',
-            // prefixed by '?'
-            '?sourceSasToken634ff46baec58062943542',
+            new ReplaceToken(
+                // prefixed by '?'
+                '?sourceSasToken634ff46baec58062943542',
+                "'?' ~ sourceSasSecret",
+                Utils::TYPE_MATCH_AS_VALUE,
+            ),
             new SynapseQuote(),
             '{{ ',
             ' }}',
