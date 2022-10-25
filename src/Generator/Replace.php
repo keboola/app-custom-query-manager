@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\CustomQueryManagerApp\Generator;
 
 use Keboola\TableBackendUtils\Escaping\QuoteInterface;
+use LogicException;
 
 class Replace
 {
@@ -110,7 +113,7 @@ class Replace
                 return $query;
             }
         } else {
-            throw new \LogicException('Unknown type');
+            throw new LogicException('Unknown type');
         }
 
         return str_replace(

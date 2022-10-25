@@ -66,7 +66,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             ),
             'sourceSasToken' => new ReplaceToken(
                 Utils::getUniqeId('sourceSasToken'),
-                 'sourceSasToken',
+                'sourceSasToken',
                 Replace::TYPE_MATCH_AS_VALUE,
             ),
 
@@ -111,8 +111,10 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         ));
         $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
         // ABS specific
-        $source->expects(self::atLeastOnce())->method('getContainerUrl')->willReturn($params['sourceContainerUrl']->getValue());
-        $source->expects(self::atLeastOnce())->method('getSasToken')->willReturn($params['sourceSasToken']->getValue());
+        $source->expects(self::atLeastOnce())->method('getContainerUrl')
+            ->willReturn($params['sourceContainerUrl']->getValue());
+        $source->expects(self::atLeastOnce())->method('getSasToken')
+            ->willReturn($params['sourceSasToken']->getValue());
 
         // fake staging table
         $stagingTable = new SnowflakeTableDefinition(

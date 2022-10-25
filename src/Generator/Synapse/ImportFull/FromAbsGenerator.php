@@ -113,7 +113,8 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         ));
         $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
         // ABS specific
-        $source->expects(self::atLeastOnce())->method('getContainerUrl')->willReturn($params['sourceContainerUrl']->getValue());
+        $source->expects(self::atLeastOnce())->method('getContainerUrl')
+            ->willReturn($params['sourceContainerUrl']->getValue());
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
