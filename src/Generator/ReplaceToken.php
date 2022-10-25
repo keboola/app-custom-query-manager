@@ -11,7 +11,7 @@ class ReplaceToken
     /**
      * @param Utils::TYPE_* $type
      */
-    public function __construct(string $value, string $replacement, int $type = Utils::TYPE_MATCH_AS_IDENTIFIER)
+    public function __construct(string $value, string $replacement, int $type = Replace::TYPE_MATCH_AS_IDENTIFIER)
     {
         $this->value = $value;
         $this->replacement = $replacement;

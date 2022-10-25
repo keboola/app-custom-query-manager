@@ -7,6 +7,7 @@ namespace Keboola\CustomQueryManagerApp\Generator\Snowflake\ImportFull;
 use Doctrine\DBAL\Connection;
 use Keboola\CsvOptions\CsvOptions;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
+use Keboola\CustomQueryManagerApp\Generator\Replace;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Snowflake;
@@ -139,7 +140,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         // result
         $replacedQueries = [];
         foreach ($queries as $query) {
-            $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SnowflakeQuote());
+            $replacedQuery = Replace::replaceParamsInQuery($query, $params, new SnowflakeQuote());
             $replacedQueries[] = $replacedQuery;
         }
 

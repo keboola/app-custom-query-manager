@@ -6,6 +6,7 @@ namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull;
 
 use Doctrine\DBAL\Connection;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
+use Keboola\CustomQueryManagerApp\Generator\Replace;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Synapse;
@@ -154,7 +155,7 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         // result
         $replacedQueries = [];
         foreach ($queries as $query) {
-            $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SynapseQuote());
+            $replacedQuery = Replace::replaceParamsInQuery($query, $params, new SynapseQuote());
             $replacedQueries[] = $replacedQuery;
         }
 

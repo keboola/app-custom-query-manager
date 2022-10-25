@@ -7,6 +7,7 @@ namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportIncremental;
 use Doctrine\DBAL\Connection;
 use Keboola\CsvOptions\CsvOptions;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
+use Keboola\CustomQueryManagerApp\Generator\Replace;
 use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
@@ -57,13 +58,13 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
                 new ReplaceToken(
                     Utils::getUniqeId('sourceFile1'),
                     'sourceFile1',
-                    Utils::TYPE_MATCH_AS_VALUE,
+                    Replace::TYPE_MATCH_AS_VALUE,
                 ),
             ],
             'sourceContainerUrl' => new ReplaceToken(
                 Utils::getUniqeId('sourceContainerUrl'),
                 'sourceContainerUrl',
-                Utils::TYPE_MATCH_AS_VALUE,
+                Replace::TYPE_MATCH_AS_VALUE,
             ),
 
             'stageTableName' => new ReplaceToken(
@@ -74,7 +75,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
                 "'tmp_' ~ stageTableName",
-                Utils::TYPE_PREFIX_AS_IDENTIFIER,
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
             'destSchemaName' => new ReplaceToken(
@@ -183,7 +184,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         // result
         $replacedQueries = [];
         foreach ($queries as $query) {
-            $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SynapseQuote());
+            $replacedQuery = Replace::replaceParamsInQuery($query, $params, new SynapseQuote());
             $replacedQueries[] = $replacedQuery;
         }
 

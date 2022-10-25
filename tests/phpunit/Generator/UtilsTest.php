@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\CustomQueryManagerApp\Tests\Generator;
 
 use Generator;
+use Keboola\CustomQueryManagerApp\Generator\Replace;
 use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\TableBackendUtils\Escaping\QuoteInterface;
@@ -35,12 +36,12 @@ class UtilsTest extends TestCase
             'sourceContainerUrl' => new ReplaceToken(
                 'sourceContainerUrl6336ebdee0b80',
                 'sourceContainerUrl',
-                Utils::TYPE_MATCH_AS_VALUE,
+                Replace::TYPE_MATCH_AS_VALUE,
             ),
             'sourceSasToken' => new ReplaceToken(
                 'sourceSasToken6336ebdee0b81',
                 'sourceSasToken',
-                Utils::TYPE_MATCH_AS_VALUE,
+                Replace::TYPE_MATCH_AS_VALUE,
             ),
             'testIdInArray' => [
                 new ReplaceToken(
@@ -52,12 +53,12 @@ class UtilsTest extends TestCase
                 new ReplaceToken(
                     'sourceFile16336ebdee0b7f',
                     'sourceFile1',
-                    Utils::TYPE_MATCH_AS_VALUE,
+                    Replace::TYPE_MATCH_AS_VALUE,
                 ),
             ],
         ];
 
-        $output = Utils::replaceParamsInQuery($input, $params, new SnowflakeQuote());
+        $output = Replace::replaceParamsInQuery($input, $params, new SnowflakeQuote());
 
         $expected = /** @lang Snowflake */ <<<SQL
             COPY INTO {{ id(stageSchemaName) }}.{{ id(stageTableName) }}
@@ -83,7 +84,7 @@ class UtilsTest extends TestCase
         string $suffix,
         string $expectedOutput
     ): void {
-        $output = Utils::replaceParamInQuery(
+        $output = Replace::replaceParamInQuery(
             $input,
             $replaceToken,
             $quoter,
@@ -149,7 +150,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 'sourceContainerUrl6336ebdee0b80',
                 'sourceContainerUrl',
-                Utils::TYPE_MATCH_AS_VALUE,
+                Replace::TYPE_MATCH_AS_VALUE,
             ),
             new SnowflakeQuote(),
             '{{ ',
@@ -178,7 +179,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 'sourceContainerUrl6336ebdee0b80',
                 'sourceContainerUrl',
-                Utils::TYPE_MATCH_AS_VALUE,
+                Replace::TYPE_MATCH_AS_VALUE,
             ),
             new SnowflakeQuote(),
             '[',
@@ -193,7 +194,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 '__temp_DEDUP_',
                 'stageDeduplicationTableName',
-                Utils::TYPE_PREFIX_AS_IDENTIFIER,
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
             new SnowflakeQuote(),
             '{{ ',
@@ -208,7 +209,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 '#__temp_csvimport',
                 'stageDeduplicationTableName',
-                Utils::TYPE_PREFIX_AS_IDENTIFIER,
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
             new SynapseQuote(),
             '{{ ',
@@ -225,7 +226,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 '_tmp',
                 'destDeduplicationTableName',
-                Utils::TYPE_SUFFIX_AS_IDENTIFIER,
+                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
             ),
             new SynapseQuote(),
             '{{ ',
@@ -241,7 +242,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 '_tmp',
                 'destDeduplicationTableName',
-                Utils::TYPE_SUFFIX_AS_IDENTIFIER,
+                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
             ),
             new SynapseQuote(),
             '{{ ',
@@ -257,7 +258,7 @@ class UtilsTest extends TestCase
             new ReplaceToken(
                 '_tmp_rename',
                 'destDeduplicationTableName',
-                Utils::TYPE_SUFFIX_AS_IDENTIFIER,
+                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
             ),
             new SynapseQuote(),
             '{{ ',
@@ -274,7 +275,7 @@ class UtilsTest extends TestCase
                 // prefixed by '?'
                 '?sourceSasToken634ff46baec58062943542',
                 "'?' ~ sourceSasSecret",
-                Utils::TYPE_MATCH_AS_VALUE,
+                Replace::TYPE_MATCH_AS_VALUE,
             ),
             new SynapseQuote(),
             '{{ ',
