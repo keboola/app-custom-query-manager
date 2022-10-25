@@ -67,23 +67,19 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
                 Replace::TYPE_MATCH_AS_VALUE,
             ),
 
-            'stageSchemaName' => new ReplaceToken(
-                Utils::getUniqeId('stageSchemaName'),
-                'stageSchemaName',
-            ),
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
-                'stageTableName',
+                "destTableName ~ rand ~ '_tmp'",
             ),
             // dedup table (suffix)
             'dedup_stageTableName' => new ReplaceToken(
                 '_tmp',
-                "stageTableName ~ '_tmp'",
+                "destTableName ~ rand ~ '_tmp_dedup'",
                 Replace::TYPE_SUFFIX_AS_IDENTIFIER,
             ),
             'dedup_rename_stageTableName' => new ReplaceToken(
                 '_tmp_rename',
-                "stageTableName ~ '_tmp_rename'",
+                "destTableName ~ rand ~ '_tmp_dedup_rename'",
                 Replace::TYPE_SUFFIX_AS_IDENTIFIER,
             ),
 
@@ -121,7 +117,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['stageSchemaName']->getValue(),
+            $params['destSchemaName']->getValue(),
             $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),

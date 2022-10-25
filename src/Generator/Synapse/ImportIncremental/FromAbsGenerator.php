@@ -69,12 +69,12 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
 
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
-                'stageTableName',
+                "destTableName ~ rand ~ '_tmp'",
             ),
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
-                "'tmp_' ~ stageTableName",
+                "destTableName ~ rand ~ '_tmp_dedup'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
@@ -158,13 +158,11 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         $qb = new SynapseTableQueryBuilder();
 
         // ACTION: create stage table
-        $conn->executeStatement('-- ACTION: create stage table');
         $conn->executeStatement(
             $qb->getCreateTableCommandFromDefinition($stagingTable)
         );
 
         // ACTION: import to stage table
-        $conn->executeStatement('-- ACTION: import to stage table');
         $importState = $importer->importToStagingTable(
             $source,
             $stagingTable,
@@ -172,7 +170,6 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         );
 
         // ACTION: import to final table
-        $conn->executeStatement('-- ACTION: import to final table');
         $toFinalTableImporter = new IncrementalImporter($conn);
         $result = $toFinalTableImporter->importToTable(
             $stagingTable,

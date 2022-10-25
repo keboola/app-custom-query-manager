@@ -63,18 +63,14 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
                 'sourceTableName',
             ),
 
-            'stageSchemaName' => new ReplaceToken(
-                Utils::getUniqeId('stageSchemaName'),
-                'stageSchemaName',
-            ),
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
-                'stageTableName',
+                "destTableName ~ rand ~ '_tmp'",
             ),
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
-                "'tmp_' ~ stageTableName",
+                "destTableName ~ rand ~ '_tmp_dedup'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
@@ -109,7 +105,7 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['stageSchemaName']->getValue(),
+            $params['destSchemaName']->getValue(),
             $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),
