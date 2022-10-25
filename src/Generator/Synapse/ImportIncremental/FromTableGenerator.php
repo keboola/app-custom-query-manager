@@ -7,6 +7,7 @@ namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportIncremental;
 use Doctrine\DBAL\Connection;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
 use Keboola\CustomQueryManagerApp\Generator\Replace;
+use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Synapse;
@@ -53,16 +54,38 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         $destPrimaryKeys = $primaryKeys;
 
         $params = [
-            'sourceSchemaName' => Utils::getUniqeId('sourceSchemaName'),
-            'sourceTableName' => Utils::getUniqeId('sourceTableName'),
+            'sourceSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('sourceSchemaName'),
+                'sourceSchemaName',
+            ),
+            'sourceTableName' => new ReplaceToken(
+                Utils::getUniqeId('sourceTableName'),
+                'sourceTableName',
+            ),
 
-            'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
-            'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
+            'stageSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('stageSchemaName'),
+                'stageSchemaName',
+            ),
+            'stageTableName' => new ReplaceToken(
+                Utils::getUniqeId('__temp_stageTableName'),
+                'stageTableName',
+            ),
             // dedup table (prefix)
-            '^\'tmp_\' ~ stageTableName' => '#__temp_csvimport',
+            'dedup_stageTableName' => new ReplaceToken(
+                '#__temp_csvimport',
+                "'tmp_' ~ stageTableName",
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
+            ),
 
-            'destSchemaName' => Utils::getUniqeId('destSchemaName'),
-            'destTableName' => Utils::getUniqeId('destTableName'),
+            'destSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('destSchemaName'),
+                'destSchemaName',
+            ),
+            'destTableName' => new ReplaceToken(
+                Utils::getUniqeId('destTableName'),
+                'destTableName',
+            ),
         ];
 
         $queries = [];
@@ -78,16 +101,16 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
 
         // fake source table
         $source = new Storage\Synapse\Table(
-            $params['sourceSchemaName'],
-            $params['sourceTableName'],
+            $params['sourceSchemaName']->getValue(),
+            $params['sourceTableName']->getValue(),
             $sourceColumns,
             $sourcePrimaryKeys,
         );
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['stageSchemaName'],
-            $params['stageTableName'],
+            $params['stageSchemaName']->getValue(),
+            $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),
             $stagePrimaryKeys,
@@ -109,8 +132,8 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         );
         // fake destination
         $destination = new SynapseTableDefinition(
-            $params['destSchemaName'],
-            $params['destTableName'],
+            $params['destSchemaName']->getValue(),
+            $params['destTableName']->getValue(),
             false,
             new ColumnCollection($destColumns),
             $destPrimaryKeys,

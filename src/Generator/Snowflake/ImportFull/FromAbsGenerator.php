@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Keboola\CsvOptions\CsvOptions;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
 use Keboola\CustomQueryManagerApp\Generator\Replace;
+use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Snowflake;
@@ -52,18 +53,46 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
 
         $params = [
             'sourceFiles' => [
-                '#sourceFile1' => Utils::getUniqeId('sourceFile1'),
+                new ReplaceToken(
+                    Utils::getUniqeId('sourceFile1'),
+                    'sourceFile1',
+                    Replace::TYPE_MATCH_AS_VALUE,
+                ),
             ],
-            '#sourceContainerUrl' => Utils::getUniqeId('sourceContainerUrl'),
-            '#sourceSasToken' => Utils::getUniqeId('sourceSasToken'),
+            'sourceContainerUrl' => new ReplaceToken(
+                Utils::getUniqeId('sourceContainerUrl'),
+                'sourceContainerUrl',
+                Replace::TYPE_MATCH_AS_VALUE,
+            ),
+            'sourceSasToken' => new ReplaceToken(
+                Utils::getUniqeId('sourceSasToken'),
+                 'sourceSasToken',
+                Replace::TYPE_MATCH_AS_VALUE,
+            ),
 
-            'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
-            'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
+            'stageSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('stageSchemaName'),
+                'stageSchemaName',
+            ),
+            'stageTableName' => new ReplaceToken(
+                Utils::getUniqeId('__temp_stageTableName'),
+                'stageTableName',
+            ),
             // dedup table (prefix)
-            '^stageDeduplicationTableName' => '__temp_DEDUP_',
+            'stageDeduplicationTableName' => new ReplaceToken(
+                '__temp_DEDUP_',
+                'stageDeduplicationTableName',
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
+            ),
 
-            'destSchemaName' => Utils::getUniqeId('destSchemaName'),
-            'destTableName' => Utils::getUniqeId('destTableName'),
+            'destSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('destSchemaName'),
+                'destSchemaName',
+            ),
+            'destTableName' => new ReplaceToken(
+                Utils::getUniqeId('destTableName'),
+                'destTableName',
+            ),
         ];
 
         $queries = [];
@@ -80,16 +109,19 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         // mock file source
         $source = $this->createMock(Storage\ABS\SourceFile::class);
         $source->expects(self::atLeastOnce())->method('getCsvOptions')->willReturn(new CsvOptions());
-        $source->expects(self::atLeastOnce())->method('getManifestEntries')->willReturn($params['sourceFiles']);
+        $source->expects(self::atLeastOnce())->method('getManifestEntries')->willReturn(array_map(
+            static fn(ReplaceToken $value) => $value->getValue(),
+            $params['sourceFiles']
+        ));
         $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
         // ABS specific
-        $source->expects(self::atLeastOnce())->method('getContainerUrl')->willReturn($params['#sourceContainerUrl']);
-        $source->expects(self::atLeastOnce())->method('getSasToken')->willReturn($params['#sourceSasToken']);
+        $source->expects(self::atLeastOnce())->method('getContainerUrl')->willReturn($params['sourceContainerUrl']->getValue());
+        $source->expects(self::atLeastOnce())->method('getSasToken')->willReturn($params['sourceSasToken']->getValue());
 
         // fake staging table
         $stagingTable = new SnowflakeTableDefinition(
-            $params['stageSchemaName'],
-            $params['stageTableName'],
+            $params['stageSchemaName']->getValue(),
+            $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),
             $stagePrimaryKeys
@@ -103,8 +135,8 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         );
         // fake destination
         $destination = new SnowflakeTableDefinition(
-            $params['destSchemaName'],
-            $params['destTableName'],
+            $params['destSchemaName']->getValue(),
+            $params['destTableName']->getValue(),
             false,
             new ColumnCollection($destColumns),
             $destPrimaryKeys
