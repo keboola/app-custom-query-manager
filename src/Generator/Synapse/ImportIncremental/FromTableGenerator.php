@@ -65,12 +65,12 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
 
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
-                "destTableName ~ rand ~ '_tmp'",
+                'stageTableName',
             ),
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
-                "destTableName ~ rand ~ '_tmp_dedup'",
+                "destTableName ~ rand ~ '_tmp'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
