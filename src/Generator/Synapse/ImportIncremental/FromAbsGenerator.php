@@ -58,7 +58,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
                 new ReplaceToken(
                     Utils::getUniqeId('sourceFile1'),
                     'listFiles(sourceFiles)',
-                    Replace::TYPE_MATCH_AS_VALUE,
+                    Replace::TYPE_MATCH_AS_VALUE_CUSTOM,
                 ),
             ],
             'sourceContainerUrl' => new ReplaceToken(

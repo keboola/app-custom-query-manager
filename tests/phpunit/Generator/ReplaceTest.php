@@ -61,13 +61,13 @@ class ReplaceTest extends TestCase
 
         $expected = /** @lang Snowflake */ <<<SQL
             COPY INTO {{ id(stageSchemaName) }}.{{ id(stageTableName) }}
-            FROM {{ sourceContainerUrl }}
-            CREDENTIALS=(AZURE_SAS_TOKEN={{ sourceSasToken }})
+            FROM {{ q(sourceContainerUrl) }}
+            CREDENTIALS=(AZURE_SAS_TOKEN={{ q(sourceSasToken) }})
             FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ','
                 SKIP_HEADER = 1
                 FIELD_OPTIONALLY_ENCLOSED_BY = '\"'
                 ESCAPE_UNENCLOSED_FIELD = NONE)
-            FILES = ({{ sourceFile1 }})
+            FILES = ({{ q(sourceFile1) }})
         SQL;
         $this->assertSame($expected, $output);
     }
@@ -156,7 +156,22 @@ class ReplaceTest extends TestCase
             ' }}',
             <<<SQL
                 COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
-                FROM {{ sourceContainerUrl }}
+                FROM {{ q(sourceContainerUrl) }}
+            SQL,
+        ];
+        yield 'test custom value' => [
+            $defaultQuery,
+            new ReplaceToken(
+                'sourceContainerUrl6336ebdee0b80',
+                'listFiles(sourceContainerUrls)',
+                Replace::TYPE_MATCH_AS_VALUE_CUSTOM,
+            ),
+            new SnowflakeQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
+                FROM {{ listFiles(sourceContainerUrls) }}
             SQL,
         ];
         yield 'test id with other prefix+suffix' => [
@@ -185,7 +200,7 @@ class ReplaceTest extends TestCase
             ']',
             <<<SQL
                 COPY INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607"
-                FROM [sourceContainerUrl]
+                FROM [q(sourceContainerUrl)]
             SQL,
         ];
         yield 'test generated id at the beginning' => [
@@ -282,7 +297,7 @@ class ReplaceTest extends TestCase
             <<<SQL
                 COPY INTO [stageSchemaName634ff46baec71046847136].[__temp_stageTableName634ff46baec72821993597]
                 FROM 'sourceFile1634ff46baec6c521446965'
-                WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET={{ '?' ~ sourceSasSecret }}) )
+                WITH ( CREDENTIAL=(IDENTITY='Shared Access Signature', SECRET={{ q('?' ~ sourceSasSecret) }}) )
             SQL,
         ];
     }

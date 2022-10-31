@@ -10,28 +10,39 @@ use LogicException;
 class Replace
 {
     public const TYPE_MATCH_AS_IDENTIFIER = 1;
-    public const TYPE_MATCH_AS_VALUE = 2; // #
+    public const TYPE_MATCH_AS_VALUE = 2;
+    /** value with custom method - don't add quote method */
+    public const TYPE_MATCH_AS_VALUE_CUSTOM = 5;
     /** identifier with prefix in value */
-    public const TYPE_PREFIX_AS_IDENTIFIER = 3; // ^
+    public const TYPE_PREFIX_AS_IDENTIFIER = 3;
     /** identifier with suffix in value */
-    public const TYPE_SUFFIX_AS_IDENTIFIER = 4; // $
+    public const TYPE_SUFFIX_AS_IDENTIFIER = 4;
 
     /**
      * ReplaceToken object in `$params` can specify value purpose:
      *   - Replace::TYPE_MATCH_AS_IDENTIFIER:
-     *          `foo` => `randomName`
+     *          `randomName`
+     *          + replacement `foo`
      *          + `create table "randomName"`
      *          = `create table {{ id(foo) }}`
      *   - Replace::TYPE_MATCH_AS_VALUE:
-     *          `foo` => `randomValue`
+     *          `randomValue`
+     *          + replacement `foo`
      *          + `select 'randomValue' from "table"`
-     *          = `select {{ foo }} from table`
+     *          = `select {{ q(foo) }} from table`
+     *   - Replace::TYPE_MATCH_AS_VALUE_CUSTOM:
+     *          `randomValue`
+     *          + replacement `fn(foo)`
+     *          + `select 'randomValue' from "table"`
+     *          = `select {{ fn(foo) }} from table`
      *   - Replace::TYPE_PREFIX_AS_IDENTIFIER:
-     *          `foo` => `__temp_import_`
+     *          `__temp_import_`
+     *          + replacement `foo`
      *          + `create table "__temp_import_randomName"`
      *          = `create table {{ id(foo) }}`
      *   - Replace::TYPE_SUFFIX_AS_IDENTIFIER:
-     *          `foo` => `_temp_import`
+     *          `_temp_import`
+     *          + replacement `foo`
      *          + `create table "randomName_temp_import"`
      *          = `create table {{ id(foo) }}`
      *
@@ -79,6 +90,9 @@ class Replace
     ): string {
 
         if ($token->getType() === self::TYPE_MATCH_AS_VALUE) {
+            $valueInQuery = $quoter::quote($token->getValue());
+            $keyInOutput = sprintf('q(%s)', $token->getReplacement());
+        } elseif ($token->getType() === self::TYPE_MATCH_AS_VALUE_CUSTOM) {
             $valueInQuery = $quoter::quote($token->getValue());
             $keyInOutput = $token->getReplacement();
         } elseif ($token->getType() === self::TYPE_MATCH_AS_IDENTIFIER) {

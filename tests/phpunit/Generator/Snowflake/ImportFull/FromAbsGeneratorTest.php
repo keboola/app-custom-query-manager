@@ -30,8 +30,8 @@ class FromAbsGeneratorTest extends TestCase
 \"column2\" VARCHAR
 );",
             "COPY INTO {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} 
-FROM {{ sourceContainerUrl }}
-CREDENTIALS=(AZURE_SAS_TOKEN={{ sourceSasToken }})
+FROM {{ q(sourceContainerUrl) }}
+CREDENTIALS=(AZURE_SAS_TOKEN={{ q(sourceSasToken) }})
 FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ',' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '\\\"' ESCAPE_UNENCLOSED_FIELD = NONE)
 FILES = ({{ listFiles(sourceFiles) }})",
             "CREATE TEMPORARY TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp_dedup') }}
