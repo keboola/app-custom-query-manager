@@ -22,45 +22,19 @@ class FromTableGeneratorTest extends TestCase
         ];
         $queries = $generator->generate($columns, $primaryKeys);
 
-        self::assertCount(8, $queries);
+        /** @codingStandardsIgnoreStart */
+        $expected = [
+            "CREATE TABLE {{ id(destSchemaName) }}.{{ id(stageTableName) }} ([column1] NVARCHAR(4000), [column2] NVARCHAR(4000)) WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)",
+            "INSERT INTO {{ id(destSchemaName) }}.{{ id(stageTableName) }} ([column1], [column2]) SELECT [column1], [column2] FROM {{ id(sourceSchemaName) }}.{{ id(sourceTableName) }}",
+            "CREATE TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX) AS SELECT a.[column1],a.[column2] FROM (SELECT COALESCE([column1], '') AS [column1],COALESCE([column2], '') AS [column2], ROW_NUMBER() OVER (PARTITION BY [column1] ORDER BY [column1]) AS \"_row_number_\" FROM {{ id(destSchemaName) }}.{{ id(stageTableName) }}) AS a WHERE a.\"_row_number_\" = 1",
+            "RENAME OBJECT {{ id(destSchemaName) }}.{{ id(destTableName) }} TO {{ id(destTableName ~ rand ~ '_tmp_rename') }}",
+            "RENAME OBJECT {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} TO {{ id(destTableName) }}",
+            "DROP TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp_rename') }}",
+            "IF OBJECT_ID (N'{{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}', N'U') IS NOT NULL DROP TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}",
+            "IF OBJECT_ID (N'{{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp_rename') }}', N'U') IS NOT NULL DROP TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp_rename') }}",
+        ];
+        /** @codingStandardsIgnoreEnd */
 
-        self::assertStringStartsWith(
-            'CREATE TABLE {{ id(stageSchemaName) }}.{{ id(stageTableName) }} ' .
-            '([column1] NVARCHAR(4000), [column2] NVARCHAR(4000)) ' .
-            'WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)',
-            $queries[0]
-        );
-        self::assertStringStartsWith(
-            'INSERT INTO {{ id(stageSchemaName) }}.{{ id(stageTableName) }} ([column1], [column2]) ' .
-            'SELECT',
-            $queries[1]
-        );
-        self::assertStringStartsWith(
-            "CREATE TABLE {{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp') }} " .
-            'WITH (DISTRIBUTION=ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX) AS SELECT',
-            $queries[2]
-        );
-        self::assertStringStartsWith(
-            'RENAME OBJECT {{ id(destSchemaName) }}.{{ id(destTableName) }} TO',
-            $queries[3]
-        );
-        self::assertStringStartsWith(
-            "RENAME OBJECT {{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp') }} TO",
-            $queries[4]
-        );
-        self::assertStringStartsWith(
-            "DROP TABLE {{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp_rename') }}",
-            $queries[5]
-        );
-        self::assertStringStartsWith(
-            "IF OBJECT_ID (N'{{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp') }}', N'U') " .
-            "IS NOT NULL DROP TABLE {{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp') }}",
-            $queries[6]
-        );
-        self::assertStringStartsWith(
-            "IF OBJECT_ID (N'{{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp_rename') }}', N'U') IS NOT NULL " .
-            "DROP TABLE {{ id(destSchemaName) }}.{{ id(stageTableName ~ '_tmp_rename') }}",
-            $queries[7]
-        );
+        self::assertSame($expected, $queries);
     }
 }

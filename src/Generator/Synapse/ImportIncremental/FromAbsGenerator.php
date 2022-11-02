@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull;
+namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportIncremental;
 
 use Doctrine\DBAL\Connection;
 use Keboola\CsvOptions\CsvOptions;
@@ -13,7 +13,7 @@ use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Synapse;
 use Keboola\Db\ImportExport\Backend\Synapse\SynapseImportOptions;
-use Keboola\Db\ImportExport\Backend\Synapse\ToFinalTable\FullImporter;
+use Keboola\Db\ImportExport\Backend\Synapse\ToFinalTable\IncrementalImporter;
 use Keboola\Db\ImportExport\Backend\Synapse\ToStage\ToStageImporter;
 use Keboola\Db\ImportExport\Storage;
 use Keboola\TableBackendUtils\Column\ColumnCollection;
@@ -71,16 +71,11 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
                 Utils::getUniqeId('__temp_stageTableName'),
                 'stageTableName',
             ),
-            // dedup table (suffix)
+            // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
-                '_tmp',
+                '#__temp_csvimport',
                 "destTableName ~ rand ~ '_tmp'",
-                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
-            ),
-            'dedup_rename_stageTableName' => new ReplaceToken(
-                '_tmp_rename',
-                "destTableName ~ rand ~ '_tmp_rename'",
-                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
             'destSchemaName' => new ReplaceToken(
@@ -176,7 +171,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         );
 
         // ACTION: import to final table
-        $toFinalTableImporter = new FullImporter($conn);
+        $toFinalTableImporter = new IncrementalImporter($conn);
         $result = $toFinalTableImporter->importToTable(
             $stagingTable,
             $destination,

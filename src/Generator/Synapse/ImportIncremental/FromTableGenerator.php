@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull;
+namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportIncremental;
 
 use Doctrine\DBAL\Connection;
-use Keboola\CsvOptions\CsvOptions;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
 use Keboola\CustomQueryManagerApp\Generator\Replace;
 use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
@@ -13,7 +12,7 @@ use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Synapse;
 use Keboola\Db\ImportExport\Backend\Synapse\SynapseImportOptions;
-use Keboola\Db\ImportExport\Backend\Synapse\ToFinalTable\FullImporter;
+use Keboola\Db\ImportExport\Backend\Synapse\ToFinalTable\IncrementalImporter;
 use Keboola\Db\ImportExport\Backend\Synapse\ToStage\ToStageImporter;
 use Keboola\Db\ImportExport\Storage;
 use Keboola\TableBackendUtils\Column\ColumnCollection;
@@ -26,7 +25,7 @@ use Keboola\TableBackendUtils\Table\SynapseTableDefinition;
 use Keboola\TableBackendUtils\Table\SynapseTableQueryBuilder;
 use PHPUnit\Framework\TestCase;
 
-class FromAbsGenerator extends TestCase implements GeneratorInterface
+class FromTableGenerator extends TestCase implements GeneratorInterface
 {
     /**
      * @param string[] $columns
@@ -36,6 +35,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
     public function generate(array $columns, array $primaryKeys = []): array
     {
         $sourceColumns = $columns;
+        $sourcePrimaryKeys = $primaryKeys;
 
         $stageColumns = [];
         foreach ($columns as $columnName) {
@@ -54,33 +54,24 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         $destPrimaryKeys = $primaryKeys;
 
         $params = [
-            'sourceFiles' => [
-                new ReplaceToken(
-                    Utils::getUniqeId('sourceFile1'),
-                    'listFiles(sourceFiles)',
-                    Replace::TYPE_MATCH_AS_VALUE_CUSTOM,
-                ),
-            ],
-            'sourceContainerUrl' => new ReplaceToken(
-                Utils::getUniqeId('sourceContainerUrl'),
-                'sourceContainerUrl',
-                Replace::TYPE_MATCH_AS_VALUE,
+            'sourceSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('sourceSchemaName'),
+                'sourceSchemaName',
+            ),
+            'sourceTableName' => new ReplaceToken(
+                Utils::getUniqeId('sourceTableName'),
+                'sourceTableName',
             ),
 
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
                 'stageTableName',
             ),
-            // dedup table (suffix)
+            // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
-                '_tmp',
+                '#__temp_csvimport',
                 "destTableName ~ rand ~ '_tmp'",
-                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
-            ),
-            'dedup_rename_stageTableName' => new ReplaceToken(
-                '_tmp_rename',
-                "destTableName ~ rand ~ '_tmp_rename'",
-                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
+                Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
             'destSchemaName' => new ReplaceToken(
@@ -104,17 +95,13 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             }
         );
 
-        // mock file source
-        $source = $this->createMock(Storage\ABS\SourceFile::class);
-        $source->expects(self::atLeastOnce())->method('getCsvOptions')->willReturn(new CsvOptions());
-        $source->expects(self::atLeastOnce())->method('getManifestEntries')->willReturn(array_map(
-            static fn(ReplaceToken $value) => $value->getValue(),
-            $params['sourceFiles']
-        ));
-        $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
-        // ABS specific
-        $source->expects(self::atLeastOnce())->method('getContainerUrl')
-            ->willReturn($params['sourceContainerUrl']->getValue());
+        // fake source table
+        $source = new Storage\Synapse\Table(
+            $params['sourceSchemaName']->getValue(),
+            $params['sourceTableName']->getValue(),
+            $sourceColumns,
+            $sourcePrimaryKeys,
+        );
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
@@ -137,8 +124,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             [],
             false,
             false,
-            1,
-            SynapseImportOptions::CREDENTIALS_MANAGED_IDENTITY,
+            1
         );
         // fake destination
         $destination = new SynapseTableDefinition(
@@ -176,7 +162,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         );
 
         // ACTION: import to final table
-        $toFinalTableImporter = new FullImporter($conn);
+        $toFinalTableImporter = new IncrementalImporter($conn);
         $result = $toFinalTableImporter->importToTable(
             $stagingTable,
             $destination,

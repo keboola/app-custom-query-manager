@@ -6,6 +6,8 @@ namespace Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull;
 
 use Doctrine\DBAL\Connection;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorInterface;
+use Keboola\CustomQueryManagerApp\Generator\Replace;
+use Keboola\CustomQueryManagerApp\Generator\ReplaceToken;
 use Keboola\CustomQueryManagerApp\Generator\Utils;
 use Keboola\Datatype\Definition\BaseType;
 use Keboola\Datatype\Definition\Synapse;
@@ -52,17 +54,39 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         $destPrimaryKeys = $primaryKeys;
 
         $params = [
-            'sourceSchemaName' => Utils::getUniqeId('sourceSchemaName'),
-            'sourceTableName' => Utils::getUniqeId('sourceTableName'),
+            'sourceSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('sourceSchemaName'),
+                'sourceSchemaName',
+            ),
+            'sourceTableName' => new ReplaceToken(
+                Utils::getUniqeId('sourceTableName'),
+                'sourceTableName',
+            ),
 
-            'stageSchemaName' => Utils::getUniqeId('stageSchemaName'),
-            'stageTableName' => Utils::getUniqeId('__temp_stageTableName'),
+            'stageTableName' => new ReplaceToken(
+                Utils::getUniqeId('__temp_stageTableName'),
+                'stageTableName',
+            ),
             // dedup table (suffix)
-            '$stageTableName ~ \'_tmp\'' => '_tmp',
-            '$stageTableName ~ \'_tmp_rename\'' => '_tmp_rename',
+            'dedup_stageTableName' => new ReplaceToken(
+                '_tmp',
+                "destTableName ~ rand ~ '_tmp'",
+                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
+            ),
+            'dedup_rename_stageTableName' => new ReplaceToken(
+                '_tmp_rename',
+                "destTableName ~ rand ~ '_tmp_rename'",
+                Replace::TYPE_SUFFIX_AS_IDENTIFIER,
+            ),
 
-            'destSchemaName' => Utils::getUniqeId('destSchemaName'),
-            'destTableName' => Utils::getUniqeId('destTableName'),
+            'destSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('destSchemaName'),
+                'destSchemaName',
+            ),
+            'destTableName' => new ReplaceToken(
+                Utils::getUniqeId('destTableName'),
+                'destTableName',
+            ),
         ];
 
         $queries = [];
@@ -78,16 +102,16 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
 
         // fake source table
         $source = new Storage\Synapse\Table(
-            $params['sourceSchemaName'],
-            $params['sourceTableName'],
+            $params['sourceSchemaName']->getValue(),
+            $params['sourceTableName']->getValue(),
             $sourceColumns,
             $sourcePrimaryKeys,
         );
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['stageSchemaName'],
-            $params['stageTableName'],
+            $params['destSchemaName']->getValue(),
+            $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),
             $stagePrimaryKeys,
@@ -109,8 +133,8 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         );
         // fake destination
         $destination = new SynapseTableDefinition(
-            $params['destSchemaName'],
-            $params['destTableName'],
+            $params['destSchemaName']->getValue(),
+            $params['destTableName']->getValue(),
             false,
             new ColumnCollection($destColumns),
             $destPrimaryKeys,
@@ -154,7 +178,7 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         // result
         $replacedQueries = [];
         foreach ($queries as $query) {
-            $replacedQuery = Utils::replaceParamsInQuery($query, $params, new SynapseQuote());
+            $replacedQuery = Replace::replaceParamsInQuery($query, $params, new SynapseQuote());
             $replacedQueries[] = $replacedQuery;
         }
 
