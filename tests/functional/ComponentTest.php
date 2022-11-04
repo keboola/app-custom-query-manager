@@ -20,7 +20,9 @@ class ComponentTest extends AbstractDatadirTestCase
     public function testGenerateAction(
         string $backend,
         string $operation,
-        string $source
+        string $operationType,
+        string $source,
+        ?string $fileStorage
     ): void {
         $specification = new DatadirTestSpecification(
             __DIR__,
@@ -35,7 +37,9 @@ class ComponentTest extends AbstractDatadirTestCase
             'parameters' => [
                 'backend' => $backend,
                 'operation' => $operation,
+                'operationType' => $operationType,
                 'source' => $source,
+                'fileStorage' => $fileStorage,
                 'columns' => [
                     'column1',
                     'column2',
@@ -72,18 +76,24 @@ class ComponentTest extends AbstractDatadirTestCase
     {
         yield 'synapse-importFull-table' => [
             'synapse',
-            'importFull',
+            'import',
+            'full',
             'table',
+            null,
         ];
         yield 'synapse-importFull-fileAbs' => [
             'synapse',
-            'importFull',
-            'fileAbs',
+            'import',
+            'full',
+            'file',
+            'abs',
         ];
         yield 'snowflake-importFull-fileAbs' => [
             'snowflake',
-            'importFull',
-            'fileAbs',
+            'import',
+            'full',
+            'file',
+            'abs'
         ];
     }
 
@@ -93,7 +103,9 @@ class ComponentTest extends AbstractDatadirTestCase
     public function testGenerateActionFailed(
         string $backend,
         string $operation,
+        string $operationType,
         string $source,
+        ?string $fileStorage,
         string $expectedStderr
     ): void {
         $specification = new DatadirTestSpecification(
@@ -109,7 +121,9 @@ class ComponentTest extends AbstractDatadirTestCase
             'parameters' => [
                 'backend' => $backend,
                 'operation' => $operation,
+                'operationType' => $operationType,
                 'source' => $source,
+                'fileStorage' => $fileStorage,
                 'columns' => [
                     'column1',
                     'column2',
@@ -130,14 +144,18 @@ class ComponentTest extends AbstractDatadirTestCase
     {
         yield 'combination not implemented yet' => [
             'snowflake',
-            'importIncremental',
+            'import',
+            'incremental',
             'table',
-            'Combination of Backend/Operation/Source not implemented yet',
+            null,
+            'Combination of options is not implemented yet',
         ];
         yield 'invalid backend value' => [
             'redshift',
-            'importFull',
+            'import',
+            'full',
             'table',
+            null,
             'The value "redshift" is not allowed for path "root.parameters.backend".' .
                 ' Permissible values: "snowflake", "synapse"',
         ];

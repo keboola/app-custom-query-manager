@@ -15,8 +15,10 @@ class GenerateActionTest extends TestCase
     public function testRunSuccess(): void
     {
         $backend = 'synapse';
-        $operation = 'importFull';
+        $operation = 'import';
+        $operationType = 'full';
         $source = 'table';
+        $fileStorage = null;
         $columns = ['column1', 'column2'];
         $primaryKeys = ['column1'];
 
@@ -30,13 +32,15 @@ class GenerateActionTest extends TestCase
 
         $generatorFactory = $this->createMock(GeneratorFactory::class);
         $generatorFactory->expects($this->atLeastOnce())->method('factory')
-            ->with($backend, $operation, $source)
+            ->with($backend, $operation, $operationType, $source, $fileStorage)
             ->willReturn($generator);
 
         $config = $this->createMock(Config::class);
         $config->expects($this->atLeastOnce())->method('getBackend')->willReturn($backend);
         $config->expects($this->atLeastOnce())->method('getOperation')->willReturn($operation);
+        $config->expects($this->atLeastOnce())->method('getOperationType')->willReturn($operationType);
         $config->expects($this->atLeastOnce())->method('getSource')->willReturn($source);
+        $config->expects($this->atLeastOnce())->method('getFileStorage')->willReturn($fileStorage);
         $config->expects($this->atLeastOnce())->method('getColumns')->willReturn($columns);
         $config->expects($this->atLeastOnce())->method('getPrimaryKeys')->willReturn($primaryKeys);
 

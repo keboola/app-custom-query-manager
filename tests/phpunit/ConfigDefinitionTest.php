@@ -39,6 +39,7 @@ class ConfigDefinitionTest extends TestCase
                 {
                     "parameters": {
                         "backend": "snowflake",
+                        "operationType": "full",
                         "source": "table",
                         "columns": [],
                         "primaryKeys": []
@@ -53,6 +54,7 @@ class ConfigDefinitionTest extends TestCase
                 {
                     "parameters": {
                         "operation": "",
+                        "operationType": "full",
                         "backend": "snowflake",
                         "source": "table",
                         "columns": [],
@@ -62,48 +64,105 @@ class ConfigDefinitionTest extends TestCase
                 JSON,
                 InvalidConfigurationException::class,
                 'The value "" is not allowed for path "root.parameters.operation". ' .
-                'Permissible values: "importFull", "importIncremental"',
+                'Permissible values: "import"',
             ],
             // TODO backend
             // TODO source
+            // TODO fileStorage
             // TODO columns
             // TODO primaryKeys
         ];
     }
 
-    public function testValidGetParametersDefinition(): void
-    {
-        $inputs = <<<JSON
-        {
-            "parameters": {
-                "operation": "importFull",
-                "backend": "snowflake",
-                "source": "fileAbs",
-                "columns": [
-                  "col1",
-                  "col2"
-                ],
-                "primaryKeys": [
-                  "col1"
-                ]
-            }
-        }
-        JSON;
-        $config = (new JsonDecode([JsonDecode::ASSOCIATIVE => true]))->decode($inputs, JsonEncoder::FORMAT);
+    /**
+     * @dataProvider provideValidConfig
+     * @param mixed[][] $expected
+     */
+    public function testValidGetParametersDefinition(
+        string $inputConfig,
+        array $expected
+    ): void {
+        $config = (new JsonDecode([JsonDecode::ASSOCIATIVE => true]))->decode($inputConfig, JsonEncoder::FORMAT);
         $processedConfig = (new Processor())->processConfiguration(new ConfigDefinition(), [$config]);
-        self::assertSame([
-            'parameters' => [
-                'operation' => 'importFull',
-                'backend' => 'snowflake',
-                'source' => 'fileAbs',
-                'columns' => [
-                    'col1',
-                    'col2',
-                ],
-                'primaryKeys' => [
-                    'col1',
+        self::assertSame($expected, $processedConfig);
+    }
+
+    /**
+     * @return mixed[][]
+     */
+    public function provideValidConfig(): array
+    {
+        return [
+            'valid with source file' => [
+                'input' => <<<JSON
+                    {
+                        "parameters": {
+                            "operation": "import",
+                            "operationType": "full",
+                            "backend": "snowflake",
+                            "source": "file",
+                            "fileStorage": "abs",
+                            "columns": [
+                              "col1",
+                              "col2"
+                            ],
+                            "primaryKeys": [
+                              "col1"
+                            ]
+                        }
+                    }
+                    JSON,
+                'expected' => [
+                    'parameters' => [
+                        'operation' => 'import',
+                        'operationType' => 'full',
+                        'backend' => 'snowflake',
+                        'source' => 'file',
+                        'fileStorage' => 'abs',
+                        'columns' => [
+                            'col1',
+                            'col2',
+                        ],
+                        'primaryKeys' => [
+                            'col1',
+                        ],
+                    ],
                 ],
             ],
-        ], $processedConfig);
+            'valid with source tzble' => [
+                'input' => <<<JSON
+                    {
+                        "parameters": {
+                            "operation": "import",
+                            "operationType": "full",
+                            "backend": "snowflake",
+                            "source": "table",
+                            "columns": [
+                              "col1",
+                              "col2"
+                            ],
+                            "primaryKeys": [
+                              "col1"
+                            ]
+                        }
+                    }
+                    JSON,
+                'expected' => [
+                    'parameters' => [
+                        'operation' => 'import',
+                        'operationType' => 'full',
+                        'backend' => 'snowflake',
+                        'source' => 'table',
+                        'columns' => [
+                            'col1',
+                            'col2',
+                        ],
+                        'primaryKeys' => [
+                            'col1',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

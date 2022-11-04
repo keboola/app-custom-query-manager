@@ -17,19 +17,29 @@ class Config extends BaseConfig
     ];
 
     // operation for generate action
-    public const OPERATION_IMPORT_FULL = 'importFull';
-    public const OPERATION_IMPORT_INCREMENTAL = 'importIncremental';
+    public const OPERATION_ACTION_IMPORT = 'import';
     public const OPERATIONS = [
-        self::OPERATION_IMPORT_FULL,
-        self::OPERATION_IMPORT_INCREMENTAL,
+        self::OPERATION_ACTION_IMPORT,
+    ];
+
+    public const OPERATION_TYPE_FULL = 'full';
+    public const OPERATION_TYPE_INCREMENTAL = 'incremental';
+    public const OPERATION_TYPES = [
+        self::OPERATION_TYPE_FULL,
+        self::OPERATION_TYPE_INCREMENTAL,
     ];
 
     // supported sources
-    public const SOURCE_FILE_ABS = 'fileAbs';
+    public const SOURCE_FILE = 'file';
     public const SOURCE_TABLE = 'table';
     public const SOURCES = [
-        self::SOURCE_FILE_ABS,
+        self::SOURCE_FILE,
         self::SOURCE_TABLE,
+    ];
+
+    public const FILE_STORAGE_ABS = 'abs';
+    public const FILE_STORAGES = [
+        self::FILE_STORAGE_ABS,
     ];
 
     /**
@@ -43,12 +53,22 @@ class Config extends BaseConfig
     }
 
     /**
-     * @return self::OPERATION_*
+     * @return self::OPERATION_ACTION_*
      */
     public function getOperation(): string
     {
         $value = $this->getStringValue(['parameters', 'operation']);
-        /** @var self::OPERATION_* $value */
+        /** @var self::OPERATION_ACTION_* $value */
+        return $value;
+    }
+
+    /**
+     * @return self::OPERATION_TYPE_*
+     */
+    public function getOperationType(): string
+    {
+        $value = $this->getStringValue(['parameters', 'operationType']);
+        /** @var self::OPERATION_TYPE_* $value */
         return $value;
     }
 
@@ -75,6 +95,21 @@ class Config extends BaseConfig
     {
         $value = $this->getStringValue(['parameters', 'source']);
         /** @var self::SOURCE_* $value */
+        return $value;
+    }
+
+    /**
+     * @return self::FILE_STORAGE_*|null
+     */
+    public function getFileStorage(): ?string
+    {
+        $value = $this->getValue(['parameters', 'fileStorage']);
+        if ($value === null) {
+            return null;
+        }
+
+        assert(is_string($value));
+        /** @var self::FILE_STORAGE_* $value */
         return $value;
     }
 }

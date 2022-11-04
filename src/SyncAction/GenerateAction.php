@@ -30,7 +30,9 @@ class GenerateAction
         $generator = $this->generatorFactory->factory(
             $this->config->getBackend(),
             $this->config->getOperation(),
+            $this->config->getOperationType(),
             $this->config->getSource(),
+            $this->config->getFileStorage(),
         );
         $queries = $generator->generate(
             $this->config->getColumns(),
