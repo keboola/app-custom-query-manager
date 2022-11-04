@@ -60,7 +60,7 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
             ),
             'sourceTableName' => new ReplaceToken(
                 Utils::getUniqeId('sourceTableName'),
-                'sourceTableName',
+                'tableName',
             ),
 
             'stageTableName' => new ReplaceToken(

@@ -25,7 +25,7 @@ class FromWorkspaceGeneratorTest extends TestCase
         /** @codingStandardsIgnoreStart */
         $expected = [
             "CREATE TABLE {{ id(destSchemaName) }}.{{ id(stageTableName) }} ([column1] NVARCHAR(4000), [column2] NVARCHAR(4000)) WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)",
-            "INSERT INTO {{ id(destSchemaName) }}.{{ id(stageTableName) }} ([column1], [column2]) SELECT [column1], [column2] FROM {{ id(schemaName) }}.{{ id(sourceTableName) }}",
+            "INSERT INTO {{ id(destSchemaName) }}.{{ id(stageTableName) }} ([column1], [column2]) SELECT [column1], [column2] FROM {{ id(schemaName) }}.{{ id(tableName) }}",
             "CREATE TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} ([column1] NVARCHAR(4000), [column2] NVARCHAR(4000)) WITH (DISTRIBUTION = ROUND_ROBIN,CLUSTERED COLUMNSTORE INDEX)",
             "BEGIN TRANSACTION",
             "UPDATE {{ id(destSchemaName) }}.{{ id(destTableName) }} SET [column2] = COALESCE([src].[column2], '') FROM {{ id(destSchemaName) }}.{{ id(stageTableName) }} AS [src] WHERE {{ id(destSchemaName) }}.{{ id(destTableName) }}.[column1] = [src].[column1] AND (COALESCE(CAST({{ id(destSchemaName) }}.{{ id(destTableName) }}.[column2] AS NVARCHAR), '') != COALESCE([src].[column2], '')) ",
