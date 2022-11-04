@@ -62,6 +62,10 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
                 ),
             ],
 
+            'stageSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('stageSchemaName'),
+                'stageSchemaName',
+            ),
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
                 'stageTableName',
@@ -105,7 +109,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['destSchemaName']->getValue(),
+            $params['stageSchemaName']->getValue(),
             $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),
