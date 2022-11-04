@@ -6,7 +6,7 @@ namespace Keboola\CustomQueryManagerApp\FunctionalTests\SyncAction;
 
 use Keboola\CustomQueryManagerApp\Config;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorFactory;
-use Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull\FromTableGenerator;
+use Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull\FromWorkspaceGenerator;
 use Keboola\CustomQueryManagerApp\SyncAction\GenerateAction;
 use PHPUnit\Framework\TestCase;
 
@@ -17,12 +17,12 @@ class GenerateActionTest extends TestCase
         $backend = 'synapse';
         $operation = 'import';
         $operationType = 'full';
-        $source = 'table';
+        $source = 'workspace';
         $fileStorage = null;
         $columns = ['column1', 'column2'];
         $primaryKeys = ['column1'];
 
-        $generator = $this->createMock(FromTableGenerator::class);
+        $generator = $this->createMock(FromWorkspaceGenerator::class);
         $generator->expects($this->atLeastOnce())->method('generate')
             ->with($columns, $primaryKeys)
             ->willReturn([

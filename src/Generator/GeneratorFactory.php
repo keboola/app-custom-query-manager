@@ -44,8 +44,8 @@ class GeneratorFactory
                             return new Generator\Synapse\ImportFull\FromAbsGenerator();
                         }
                     }
-                    if ($source === Config::SOURCE_TABLE) {
-                        return new Generator\Synapse\ImportFull\FromTableGenerator();
+                    if ($source === Config::SOURCE_WORKSPACE) {
+                        return new Generator\Synapse\ImportFull\FromWorkspaceGenerator();
                     }
                 }
                 if ($operationType === Config::OPERATION_TYPE_INCREMENTAL) {
@@ -54,8 +54,8 @@ class GeneratorFactory
                             return new Generator\Synapse\ImportIncremental\FromAbsGenerator();
                         }
                     }
-                    if ($source === Config::SOURCE_TABLE) {
-                        return new Generator\Synapse\ImportIncremental\FromTableGenerator();
+                    if ($source === Config::SOURCE_WORKSPACE) {
+                        return new Generator\Synapse\ImportIncremental\FromWorkspaceGenerator();
                     }
                 }
             }

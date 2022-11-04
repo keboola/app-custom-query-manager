@@ -31,10 +31,10 @@ class Config extends BaseConfig
 
     // supported sources
     public const SOURCE_FILE = 'file';
-    public const SOURCE_TABLE = 'table';
+    public const SOURCE_WORKSPACE = 'workspace';
     public const SOURCES = [
         self::SOURCE_FILE,
-        self::SOURCE_TABLE,
+        self::SOURCE_WORKSPACE,
     ];
 
     public const FILE_STORAGE_ABS = 'abs';

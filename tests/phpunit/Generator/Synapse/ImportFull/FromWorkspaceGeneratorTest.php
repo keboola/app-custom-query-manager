@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Keboola\CustomQueryManagerApp\Tests\Generator\Synapse\ImportFull;
 
-use Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull\FromTableGenerator;
+use Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull\FromWorkspaceGenerator;
 use PHPUnit\Framework\TestCase;
 
-class FromTableGeneratorTest extends TestCase
+class FromWorkspaceGeneratorTest extends TestCase
 {
     public function testGenerate(): void
     {
-        $generator = new FromTableGenerator();
+        $generator = new FromWorkspaceGenerator();
 
         $columns = [
             'column1',

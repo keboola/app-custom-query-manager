@@ -40,7 +40,7 @@ class ConfigDefinitionTest extends TestCase
                     "parameters": {
                         "backend": "snowflake",
                         "operationType": "full",
-                        "source": "table",
+                        "source": "workspace",
                         "columns": [],
                         "primaryKeys": []
                     }
@@ -56,7 +56,7 @@ class ConfigDefinitionTest extends TestCase
                         "operation": "",
                         "operationType": "full",
                         "backend": "snowflake",
-                        "source": "table",
+                        "source": "workspace",
                         "columns": [],
                         "primaryKeys": []
                     }
@@ -188,14 +188,14 @@ class ConfigDefinitionTest extends TestCase
                     ],
                 ],
             ],
-            'valid with source table' => [
+            'valid with source workspace' => [
                 'input' => <<<JSON
                     {
                         "parameters": {
                             "operation": "import",
                             "operationType": "full",
                             "backend": "snowflake",
-                            "source": "table",
+                            "source": "workspace",
                             "columns": [
                               "col1",
                               "col2"
@@ -211,7 +211,7 @@ class ConfigDefinitionTest extends TestCase
                         'operation' => 'import',
                         'operationType' => 'full',
                         'backend' => 'snowflake',
-                        'source' => 'table',
+                        'source' => 'workspace',
                         'columns' => [
                             'col1',
                             'col2',

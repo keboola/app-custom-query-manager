@@ -25,7 +25,7 @@ use Keboola\TableBackendUtils\Table\SynapseTableDefinition;
 use Keboola\TableBackendUtils\Table\SynapseTableQueryBuilder;
 use PHPUnit\Framework\TestCase;
 
-class FromTableGenerator extends TestCase implements GeneratorInterface
+class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
 {
     /**
      * @param string[] $columns

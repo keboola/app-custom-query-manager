@@ -74,26 +74,26 @@ class ComponentTest extends AbstractDatadirTestCase
 
     public function generateActionProvider(): Generator
     {
-        yield 'synapse-importFull-table' => [
+        yield 'synapse-import-full-workspace' => [
             'synapse',
             'import',
             'full',
-            'table',
+            'workspace',
             null,
         ];
-        yield 'synapse-importFull-fileAbs' => [
+        yield 'synapse-import-full-file-abs' => [
             'synapse',
             'import',
             'full',
             'file',
             'abs',
         ];
-        yield 'snowflake-importFull-fileAbs' => [
+        yield 'snowflake-import-full-file-abs' => [
             'snowflake',
             'import',
             'full',
             'file',
-            'abs'
+            'abs',
         ];
     }
 
@@ -146,7 +146,7 @@ class ComponentTest extends AbstractDatadirTestCase
             'snowflake',
             'import',
             'incremental',
-            'table',
+            'workspace',
             null,
             'Combination of options is not implemented yet',
         ];
@@ -154,7 +154,7 @@ class ComponentTest extends AbstractDatadirTestCase
             'redshift',
             'import',
             'full',
-            'table',
+            'workspace',
             null,
             'The value "redshift" is not allowed for path "root.parameters.backend".' .
                 ' Permissible values: "snowflake", "synapse"',
