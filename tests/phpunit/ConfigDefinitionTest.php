@@ -66,6 +66,65 @@ class ConfigDefinitionTest extends TestCase
                 'The value "" is not allowed for path "root.parameters.operation". ' .
                 'Permissible values: "import"',
             ],
+            'source file - missing fileStorage' => [
+                /** @lang JSON */ <<<JSON
+                {
+                    "parameters": {
+                        "operation": "import",
+                        "operationType": "full",
+                        "backend": "snowflake",
+                        "source": "file",
+                        "columns": [
+                          "column1"
+                        ],
+                        "primaryKeys": []
+                    }
+                }
+                JSON,
+                InvalidConfigurationException::class,
+                'A value is required for option "root.parameters.fileStorage" ' .
+                'if "root.parameters.source" contains "file" value.',
+            ],
+            'source file - nullable fileStorage' => [
+                /** @lang JSON */ <<<JSON
+                {
+                    "parameters": {
+                        "operation": "import",
+                        "operationType": "full",
+                        "backend": "snowflake",
+                        "source": "file",
+                        "fileStorage": null,
+                        "columns": [
+                          "column1"
+                        ],
+                        "primaryKeys": []
+                    }
+                }
+                JSON,
+                InvalidConfigurationException::class,
+                'A value is required for option "root.parameters.fileStorage" ' .
+                'if "root.parameters.source" contains "file" value.',
+            ],
+            'source file - empty fileStorage' => [
+                /** @lang JSON */ <<<JSON
+                {
+                    "parameters": {
+                        "operation": "import",
+                        "operationType": "full",
+                        "backend": "snowflake",
+                        "source": "file",
+                        "fileStorage": "",
+                        "columns": [
+                          "column1"
+                        ],
+                        "primaryKeys": []
+                    }
+                }
+                JSON,
+                InvalidConfigurationException::class,
+                'The value "" is not allowed for path "root.parameters.fileStorage". ' .
+                'Permissible values: "abs", null',
+            ],
             // TODO backend
             // TODO source
             // TODO fileStorage
@@ -129,7 +188,7 @@ class ConfigDefinitionTest extends TestCase
                     ],
                 ],
             ],
-            'valid with source tzble' => [
+            'valid with source table' => [
                 'input' => <<<JSON
                     {
                         "parameters": {
