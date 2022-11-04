@@ -23,9 +23,7 @@ class GenerateAction
     }
 
     /**
-     * @codingStandardsIgnoreStart
-     * @return array{action: string, backend: string, operation: string, columns: string[], primaryKeys: string[], source: string, output: array{queries: array{sql: string, description: string}[]}}
-     * @codingStandardsIgnoreEnd
+     * @return array{output: array{queries: array{sql: string, description: string}[]}}
      */
     public function run(): array
     {
@@ -40,12 +38,6 @@ class GenerateAction
         );
 
         return [
-            'action' => self::NAME,
-            'backend' => $this->config->getBackend(),
-            'operation' => $this->config->getOperation(),
-            'source' => $this->config->getSource(),
-            'columns' => $this->config->getColumns(),
-            'primaryKeys' => $this->config->getPrimaryKeys(),
             'output' => [
                 'queries' => $this->formatQueriesForOutput($queries),
             ],

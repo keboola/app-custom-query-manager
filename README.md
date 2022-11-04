@@ -37,7 +37,24 @@ Run component:
 docker-compose run --rm dev
 ```
 
-Will return JSON with query templates.
+Will return JSON with query templates, like this:
+
+```json
+{
+  "output": {
+    "queries": [
+      {
+        "sql": "CREATE TABLE {{ id(destSchemaName) }}.{{ id(stageTableName) }} ...",
+        "description": ""
+      },
+      {
+        "sql": "INSERT INTO {{ id(destSchemaName) }}.{{ id(stageTableName) }} ...",
+        "description": ""
+      }
+    ]
+  }
+}
+```
 
 ## Development
  

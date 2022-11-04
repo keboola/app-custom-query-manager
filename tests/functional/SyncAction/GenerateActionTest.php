@@ -43,24 +43,6 @@ class GenerateActionTest extends TestCase
         $action = new GenerateAction($generatorFactory, $config);
         $output = $action->run();
 
-        $this->assertArrayHasKey('action', $output);
-        $this->assertSame('generate', $output['action']);
-
-        $this->assertArrayHasKey('backend', $output);
-        $this->assertSame($backend, $output['backend']);
-
-        $this->assertArrayHasKey('operation', $output);
-        $this->assertSame($operation, $output['operation']);
-
-        $this->assertArrayHasKey('source', $output);
-        $this->assertSame($source, $output['source']);
-
-        $this->assertArrayHasKey('columns', $output);
-        $this->assertSame($columns, $output['columns']);
-
-        $this->assertArrayHasKey('primaryKeys', $output);
-        $this->assertSame($primaryKeys, $output['primaryKeys']);
-
         $this->assertArrayHasKey('output', $output);
         $this->assertArrayHasKey('queries', $output['output']);
 
