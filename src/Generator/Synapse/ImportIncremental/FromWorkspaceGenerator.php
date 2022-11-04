@@ -56,7 +56,7 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
         $params = [
             'sourceSchemaName' => new ReplaceToken(
                 Utils::getUniqeId('sourceSchemaName'),
-                'sourceSchemaName',
+                'schemaName',
             ),
             'sourceTableName' => new ReplaceToken(
                 Utils::getUniqeId('sourceTableName'),
