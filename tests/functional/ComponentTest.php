@@ -81,10 +81,24 @@ class ComponentTest extends AbstractDatadirTestCase
             'workspace',
             null,
         ];
+        yield 'synapse-import-incremental-workspace' => [
+            'synapse',
+            'import',
+            'incremental',
+            'workspace',
+            null,
+        ];
         yield 'synapse-import-full-file-abs' => [
             'synapse',
             'import',
             'full',
+            'file',
+            'abs',
+        ];
+        yield 'synapse-import-incremental-file-abs' => [
+            'synapse',
+            'import',
+            'incremental',
             'file',
             'abs',
         ];
