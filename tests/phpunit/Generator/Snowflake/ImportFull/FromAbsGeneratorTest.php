@@ -24,26 +24,26 @@ class FromAbsGeneratorTest extends TestCase
 
         /** @codingStandardsIgnoreStart */
         $expected = [
-            "CREATE TEMPORARY TABLE {{ id(destSchemaName) }}.{{ id(stageTableName) }}
+            "CREATE TEMPORARY TABLE {{ id(stageSchemaName) }}.{{ id(stageTableName) }}
 (
 \"column1\" VARCHAR,
 \"column2\" VARCHAR
 );",
-            "COPY INTO {{ id(destSchemaName) }}.{{ id(stageTableName) }} 
+            "COPY INTO {{ id(stageSchemaName) }}.{{ id(stageTableName) }} 
 FROM {{ q(sourceContainerUrl) }}
 CREDENTIALS=(AZURE_SAS_TOKEN={{ q(sourceSasToken) }})
 FILE_FORMAT = (TYPE=CSV FIELD_DELIMITER = ',' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '\\\"' ESCAPE_UNENCLOSED_FIELD = NONE)
 FILES = ({{ listFiles(sourceFiles) }})",
-            "CREATE TEMPORARY TABLE {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}
+            "CREATE TEMPORARY TABLE {{ id(stageSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}
 (
 \"column1\" VARCHAR,
 \"column2\" VARCHAR
 );",
-            "INSERT INTO {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} (\"column1\", \"column2\") SELECT a.\"column1\",a.\"column2\" FROM (SELECT \"column1\", \"column2\", ROW_NUMBER() OVER (PARTITION BY \"column1\" ORDER BY \"column1\") AS \"_row_number_\" FROM {{ id(destSchemaName) }}.{{ id(stageTableName) }}) AS a WHERE a.\"_row_number_\" = 1",
+            "INSERT INTO {{ id(stageSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} (\"column1\", \"column2\") SELECT a.\"column1\",a.\"column2\" FROM (SELECT \"column1\", \"column2\", ROW_NUMBER() OVER (PARTITION BY \"column1\" ORDER BY \"column1\") AS \"_row_number_\" FROM {{ id(stageSchemaName) }}.{{ id(stageTableName) }}) AS a WHERE a.\"_row_number_\" = 1",
             "BEGIN TRANSACTION",
             "TRUNCATE TABLE {{ id(destSchemaName) }}.{{ id(destTableName) }}",
-            "INSERT INTO {{ id(destSchemaName) }}.{{ id(destTableName) }} (\"column1\", \"column2\") (SELECT COALESCE(\"column1\", '') AS \"column1\",COALESCE(\"column2\", '') AS \"column2\" FROM {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} AS \"src\")",
-            "DROP TABLE IF EXISTS {{ id(destSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}",
+            "INSERT INTO {{ id(destSchemaName) }}.{{ id(destTableName) }} (\"column1\", \"column2\") (SELECT COALESCE(\"column1\", '') AS \"column1\",COALESCE(\"column2\", '') AS \"column2\" FROM {{ id(stageSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }} AS \"src\")",
+            "DROP TABLE IF EXISTS {{ id(stageSchemaName) }}.{{ id(destTableName ~ rand ~ '_tmp') }}",
             "COMMIT",
         ];
         /** @codingStandardsIgnoreEnd */

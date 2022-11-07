@@ -23,6 +23,18 @@ class ConfigDefinition extends BaseConfigDefinition
                     ->isRequired()
                     ->values(Config::OPERATIONS)
                 ->end()
+                ->enumNode('operationType')
+                    ->isRequired()
+                    ->values(Config::OPERATION_TYPES)
+                ->end()
+                ->enumNode('source')
+                    ->isRequired()
+                    ->values(Config::SOURCES)
+                ->end()
+                ->enumNode('fileStorage')
+                    // allow `null` because it's optional
+                    ->values(array_merge(Config::FILE_STORAGES, [null]))
+                ->end()
                 ->arrayNode('columns')
                     ->isRequired()
                     ->requiresAtLeastOneElement()
@@ -36,10 +48,20 @@ class ConfigDefinition extends BaseConfigDefinition
                     ->defaultValue([])
                     ->end()
                 ->end()
-                ->enumNode('source')
-                    ->isRequired()
-                    ->values(Config::SOURCES)
-                ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) {
+                    if (!is_array($v)) {
+                        return true;
+                    }
+                    $source = $v['source'];
+                    $fileStorage = $v['fileStorage'] ?? null;
+                    if ($source === Config::SOURCE_FILE && $fileStorage === null) {
+                        return true;
+                    }
+                })
+                ->thenInvalid('A value is required for option "root.parameters.fileStorage" ' .
+                    'if "root.parameters.source" contains "file" value.')
             ->end()
         ;
         // @formatter:on

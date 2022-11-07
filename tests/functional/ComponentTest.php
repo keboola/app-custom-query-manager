@@ -20,7 +20,9 @@ class ComponentTest extends AbstractDatadirTestCase
     public function testGenerateAction(
         string $backend,
         string $operation,
-        string $source
+        string $operationType,
+        string $source,
+        ?string $fileStorage
     ): void {
         $specification = new DatadirTestSpecification(
             __DIR__,
@@ -35,7 +37,9 @@ class ComponentTest extends AbstractDatadirTestCase
             'parameters' => [
                 'backend' => $backend,
                 'operation' => $operation,
+                'operationType' => $operationType,
                 'source' => $source,
+                'fileStorage' => $fileStorage,
                 'columns' => [
                     'column1',
                     'column2',
@@ -58,13 +62,6 @@ class ComponentTest extends AbstractDatadirTestCase
 
         self::assertIsArray($output);
 
-        self::assertArrayHasKey('action', $output);
-        self::assertArrayHasKey('backend', $output);
-        self::assertArrayHasKey('operation', $output);
-        self::assertArrayHasKey('source', $output);
-        self::assertArrayHasKey('columns', $output);
-        self::assertArrayHasKey('primaryKeys', $output);
-
         self::assertArrayHasKey('output', $output);
         self::assertArrayHasKey('queries', $output['output']);
         $queries = $output['output']['queries'];
@@ -77,20 +74,40 @@ class ComponentTest extends AbstractDatadirTestCase
 
     public function generateActionProvider(): Generator
     {
-        yield 'synapse-importFull-table' => [
+        yield 'synapse-import-full-workspace' => [
             'synapse',
-            'importFull',
-            'table',
+            'import',
+            'full',
+            'workspace',
+            null,
         ];
-        yield 'synapse-importFull-fileAbs' => [
+        yield 'synapse-import-incremental-workspace' => [
             'synapse',
-            'importFull',
-            'fileAbs',
+            'import',
+            'incremental',
+            'workspace',
+            null,
         ];
-        yield 'snowflake-importFull-fileAbs' => [
+        yield 'synapse-import-full-file-abs' => [
+            'synapse',
+            'import',
+            'full',
+            'file',
+            'abs',
+        ];
+        yield 'synapse-import-incremental-file-abs' => [
+            'synapse',
+            'import',
+            'incremental',
+            'file',
+            'abs',
+        ];
+        yield 'snowflake-import-full-file-abs' => [
             'snowflake',
-            'importFull',
-            'fileAbs',
+            'import',
+            'full',
+            'file',
+            'abs',
         ];
     }
 
@@ -100,7 +117,9 @@ class ComponentTest extends AbstractDatadirTestCase
     public function testGenerateActionFailed(
         string $backend,
         string $operation,
+        string $operationType,
         string $source,
+        ?string $fileStorage,
         string $expectedStderr
     ): void {
         $specification = new DatadirTestSpecification(
@@ -116,7 +135,9 @@ class ComponentTest extends AbstractDatadirTestCase
             'parameters' => [
                 'backend' => $backend,
                 'operation' => $operation,
+                'operationType' => $operationType,
                 'source' => $source,
+                'fileStorage' => $fileStorage,
                 'columns' => [
                     'column1',
                     'column2',
@@ -137,14 +158,18 @@ class ComponentTest extends AbstractDatadirTestCase
     {
         yield 'combination not implemented yet' => [
             'snowflake',
-            'importIncremental',
-            'table',
-            'Combination of Backend/Operation/Source not implemented yet',
+            'import',
+            'incremental',
+            'workspace',
+            null,
+            'Combination of options is not implemented yet',
         ];
         yield 'invalid backend value' => [
             'redshift',
-            'importFull',
-            'table',
+            'import',
+            'full',
+            'workspace',
+            null,
             'The value "redshift" is not allowed for path "root.parameters.backend".' .
                 ' Permissible values: "snowflake", "synapse"',
         ];

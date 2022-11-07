@@ -20,9 +20,7 @@ class Component extends BaseComponent
     }
 
     /**
-     * @codingStandardsIgnoreStart
-     * @return array{action: string, backend: string, operation: string, columns: string[], primaryKeys: string[], source: string, output: array{queries: array{sql: string, description: string}[]}}
-     * @codingStandardsIgnoreEnd
+     * @return array{output: array{queries: array{sql: string, description: string}[]}}
      */
     public function actionGenerate(): array
     {

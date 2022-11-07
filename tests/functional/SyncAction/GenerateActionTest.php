@@ -6,7 +6,7 @@ namespace Keboola\CustomQueryManagerApp\FunctionalTests\SyncAction;
 
 use Keboola\CustomQueryManagerApp\Config;
 use Keboola\CustomQueryManagerApp\Generator\GeneratorFactory;
-use Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull\FromTableGenerator;
+use Keboola\CustomQueryManagerApp\Generator\Synapse\ImportFull\FromWorkspaceGenerator;
 use Keboola\CustomQueryManagerApp\SyncAction\GenerateAction;
 use PHPUnit\Framework\TestCase;
 
@@ -15,12 +15,14 @@ class GenerateActionTest extends TestCase
     public function testRunSuccess(): void
     {
         $backend = 'synapse';
-        $operation = 'importFull';
-        $source = 'table';
+        $operation = 'import';
+        $operationType = 'full';
+        $source = 'workspace';
+        $fileStorage = null;
         $columns = ['column1', 'column2'];
         $primaryKeys = ['column1'];
 
-        $generator = $this->createMock(FromTableGenerator::class);
+        $generator = $this->createMock(FromWorkspaceGenerator::class);
         $generator->expects($this->atLeastOnce())->method('generate')
             ->with($columns, $primaryKeys)
             ->willReturn([
@@ -30,36 +32,20 @@ class GenerateActionTest extends TestCase
 
         $generatorFactory = $this->createMock(GeneratorFactory::class);
         $generatorFactory->expects($this->atLeastOnce())->method('factory')
-            ->with($backend, $operation, $source)
+            ->with($backend, $operation, $operationType, $source, $fileStorage)
             ->willReturn($generator);
 
         $config = $this->createMock(Config::class);
         $config->expects($this->atLeastOnce())->method('getBackend')->willReturn($backend);
         $config->expects($this->atLeastOnce())->method('getOperation')->willReturn($operation);
+        $config->expects($this->atLeastOnce())->method('getOperationType')->willReturn($operationType);
         $config->expects($this->atLeastOnce())->method('getSource')->willReturn($source);
+        $config->expects($this->atLeastOnce())->method('getFileStorage')->willReturn($fileStorage);
         $config->expects($this->atLeastOnce())->method('getColumns')->willReturn($columns);
         $config->expects($this->atLeastOnce())->method('getPrimaryKeys')->willReturn($primaryKeys);
 
         $action = new GenerateAction($generatorFactory, $config);
         $output = $action->run();
-
-        $this->assertArrayHasKey('action', $output);
-        $this->assertSame('generate', $output['action']);
-
-        $this->assertArrayHasKey('backend', $output);
-        $this->assertSame($backend, $output['backend']);
-
-        $this->assertArrayHasKey('operation', $output);
-        $this->assertSame($operation, $output['operation']);
-
-        $this->assertArrayHasKey('source', $output);
-        $this->assertSame($source, $output['source']);
-
-        $this->assertArrayHasKey('columns', $output);
-        $this->assertSame($columns, $output['columns']);
-
-        $this->assertArrayHasKey('primaryKeys', $output);
-        $this->assertSame($primaryKeys, $output['primaryKeys']);
 
         $this->assertArrayHasKey('output', $output);
         $this->assertArrayHasKey('queries', $output['output']);

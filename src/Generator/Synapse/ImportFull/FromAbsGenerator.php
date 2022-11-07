@@ -61,12 +61,11 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
                     Replace::TYPE_MATCH_AS_VALUE_CUSTOM,
                 ),
             ],
-            'sourceContainerUrl' => new ReplaceToken(
-                Utils::getUniqeId('sourceContainerUrl'),
-                'sourceContainerUrl',
-                Replace::TYPE_MATCH_AS_VALUE,
-            ),
 
+            'stageSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('stageSchemaName'),
+                'stageSchemaName',
+            ),
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
                 'stageTableName',
@@ -112,13 +111,10 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             $params['sourceFiles']
         ));
         $source->expects(self::atLeastOnce())->method('getColumnsNames')->willReturn($sourceColumns);
-        // ABS specific
-        $source->expects(self::atLeastOnce())->method('getContainerUrl')
-            ->willReturn($params['sourceContainerUrl']->getValue());
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['destSchemaName']->getValue(),
+            $params['stageSchemaName']->getValue(),
             $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),

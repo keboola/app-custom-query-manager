@@ -25,7 +25,7 @@ use Keboola\TableBackendUtils\Table\SynapseTableDefinition;
 use Keboola\TableBackendUtils\Table\SynapseTableQueryBuilder;
 use PHPUnit\Framework\TestCase;
 
-class FromTableGenerator extends TestCase implements GeneratorInterface
+class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
 {
     /**
      * @param string[] $columns
@@ -56,13 +56,17 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
         $params = [
             'sourceSchemaName' => new ReplaceToken(
                 Utils::getUniqeId('sourceSchemaName'),
-                'sourceSchemaName',
+                'schemaName',
             ),
             'sourceTableName' => new ReplaceToken(
                 Utils::getUniqeId('sourceTableName'),
-                'sourceTableName',
+                'tableName',
             ),
 
+            'stageSchemaName' => new ReplaceToken(
+                Utils::getUniqeId('stageSchemaName'),
+                'stageSchemaName',
+            ),
             'stageTableName' => new ReplaceToken(
                 Utils::getUniqeId('__temp_stageTableName'),
                 'stageTableName',
@@ -105,7 +109,7 @@ class FromTableGenerator extends TestCase implements GeneratorInterface
 
         // fake staging table
         $stagingTable = new SynapseTableDefinition(
-            $params['destSchemaName']->getValue(),
+            $params['stageSchemaName']->getValue(),
             $params['stageTableName']->getValue(),
             true,
             new ColumnCollection($stageColumns),

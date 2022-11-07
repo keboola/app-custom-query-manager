@@ -7,8 +7,11 @@ Generates templates for Custom Query feature in Keboola Connection platform.
 Create configuration in `data/config.json` with:
 - `parameters`:
     - `backend`: one of supported backend: `synapse`, `snowflake`; required
-    - `operation`: one of supported operation: `importFull`, `importIncremental`; required
-    - `source`: one of supported operation: `table`, `fileAbs`; required
+    - `operation`: one of supported operation: `import`; required
+    - `operationType`: one of supported operation's type: `full`, `incremental`; required
+    - `source`: one of supported source: `workspace`, `file`; required
+    - `fileStorage`: one of supported file storage: `abs` (Azure Blob Storage);
+      optional, but required if `source` is `file`
     - `columns`: list of columns; required
     - `primaryKeys`: list of primary keys; optional
 - `action`: one of supported sync action to be run: `generate`; required
@@ -18,8 +21,10 @@ for example:
 {
   "parameters": {
     "backend": "synapse",
-    "operation": "importFull",
-    "source": "fileAbs",
+    "operation": "import",
+    "operationType": "full",
+    "source": "file",
+    "fileStorage": "abs",
     "columns": [
       "column1",
       "column2"
@@ -37,7 +42,24 @@ Run component:
 docker-compose run --rm dev
 ```
 
-Will return JSON with query templates.
+Will return JSON with query templates, like this:
+
+```json
+{
+  "output": {
+    "queries": [
+      {
+        "sql": "CREATE TABLE {{ id(destSchemaName) }}.{{ id(stageTableName) }} ...",
+        "description": ""
+      },
+      {
+        "sql": "INSERT INTO {{ id(destSchemaName) }}.{{ id(stageTableName) }} ...",
+        "description": ""
+      }
+    ]
+  }
+}
+```
 
 ## Development
  

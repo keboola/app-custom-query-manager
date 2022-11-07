@@ -39,7 +39,8 @@ class ConfigDefinitionTest extends TestCase
                 {
                     "parameters": {
                         "backend": "snowflake",
-                        "source": "table",
+                        "operationType": "full",
+                        "source": "workspace",
                         "columns": [],
                         "primaryKeys": []
                     }
@@ -53,8 +54,9 @@ class ConfigDefinitionTest extends TestCase
                 {
                     "parameters": {
                         "operation": "",
+                        "operationType": "full",
                         "backend": "snowflake",
-                        "source": "table",
+                        "source": "workspace",
                         "columns": [],
                         "primaryKeys": []
                     }
@@ -62,48 +64,164 @@ class ConfigDefinitionTest extends TestCase
                 JSON,
                 InvalidConfigurationException::class,
                 'The value "" is not allowed for path "root.parameters.operation". ' .
-                'Permissible values: "importFull", "importIncremental"',
+                'Permissible values: "import"',
+            ],
+            'source file - missing fileStorage' => [
+                /** @lang JSON */ <<<JSON
+                {
+                    "parameters": {
+                        "operation": "import",
+                        "operationType": "full",
+                        "backend": "snowflake",
+                        "source": "file",
+                        "columns": [
+                          "column1"
+                        ],
+                        "primaryKeys": []
+                    }
+                }
+                JSON,
+                InvalidConfigurationException::class,
+                'A value is required for option "root.parameters.fileStorage" ' .
+                'if "root.parameters.source" contains "file" value.',
+            ],
+            'source file - nullable fileStorage' => [
+                /** @lang JSON */ <<<JSON
+                {
+                    "parameters": {
+                        "operation": "import",
+                        "operationType": "full",
+                        "backend": "snowflake",
+                        "source": "file",
+                        "fileStorage": null,
+                        "columns": [
+                          "column1"
+                        ],
+                        "primaryKeys": []
+                    }
+                }
+                JSON,
+                InvalidConfigurationException::class,
+                'A value is required for option "root.parameters.fileStorage" ' .
+                'if "root.parameters.source" contains "file" value.',
+            ],
+            'source file - empty fileStorage' => [
+                /** @lang JSON */ <<<JSON
+                {
+                    "parameters": {
+                        "operation": "import",
+                        "operationType": "full",
+                        "backend": "snowflake",
+                        "source": "file",
+                        "fileStorage": "",
+                        "columns": [
+                          "column1"
+                        ],
+                        "primaryKeys": []
+                    }
+                }
+                JSON,
+                InvalidConfigurationException::class,
+                'The value "" is not allowed for path "root.parameters.fileStorage". ' .
+                'Permissible values: "abs", null',
             ],
             // TODO backend
             // TODO source
+            // TODO fileStorage
             // TODO columns
             // TODO primaryKeys
         ];
     }
 
-    public function testValidGetParametersDefinition(): void
-    {
-        $inputs = <<<JSON
-        {
-            "parameters": {
-                "operation": "importFull",
-                "backend": "snowflake",
-                "source": "fileAbs",
-                "columns": [
-                  "col1",
-                  "col2"
-                ],
-                "primaryKeys": [
-                  "col1"
-                ]
-            }
-        }
-        JSON;
-        $config = (new JsonDecode([JsonDecode::ASSOCIATIVE => true]))->decode($inputs, JsonEncoder::FORMAT);
+    /**
+     * @dataProvider provideValidConfig
+     * @param mixed[][] $expected
+     */
+    public function testValidGetParametersDefinition(
+        string $inputConfig,
+        array $expected
+    ): void {
+        $config = (new JsonDecode([JsonDecode::ASSOCIATIVE => true]))->decode($inputConfig, JsonEncoder::FORMAT);
         $processedConfig = (new Processor())->processConfiguration(new ConfigDefinition(), [$config]);
-        self::assertSame([
-            'parameters' => [
-                'operation' => 'importFull',
-                'backend' => 'snowflake',
-                'source' => 'fileAbs',
-                'columns' => [
-                    'col1',
-                    'col2',
-                ],
-                'primaryKeys' => [
-                    'col1',
+        self::assertSame($expected, $processedConfig);
+    }
+
+    /**
+     * @return mixed[][]
+     */
+    public function provideValidConfig(): array
+    {
+        return [
+            'valid with source file' => [
+                'input' => <<<JSON
+                    {
+                        "parameters": {
+                            "operation": "import",
+                            "operationType": "full",
+                            "backend": "snowflake",
+                            "source": "file",
+                            "fileStorage": "abs",
+                            "columns": [
+                              "col1",
+                              "col2"
+                            ],
+                            "primaryKeys": [
+                              "col1"
+                            ]
+                        }
+                    }
+                    JSON,
+                'expected' => [
+                    'parameters' => [
+                        'operation' => 'import',
+                        'operationType' => 'full',
+                        'backend' => 'snowflake',
+                        'source' => 'file',
+                        'fileStorage' => 'abs',
+                        'columns' => [
+                            'col1',
+                            'col2',
+                        ],
+                        'primaryKeys' => [
+                            'col1',
+                        ],
+                    ],
                 ],
             ],
-        ], $processedConfig);
+            'valid with source workspace' => [
+                'input' => <<<JSON
+                    {
+                        "parameters": {
+                            "operation": "import",
+                            "operationType": "full",
+                            "backend": "snowflake",
+                            "source": "workspace",
+                            "columns": [
+                              "col1",
+                              "col2"
+                            ],
+                            "primaryKeys": [
+                              "col1"
+                            ]
+                        }
+                    }
+                    JSON,
+                'expected' => [
+                    'parameters' => [
+                        'operation' => 'import',
+                        'operationType' => 'full',
+                        'backend' => 'snowflake',
+                        'source' => 'workspace',
+                        'columns' => [
+                            'col1',
+                            'col2',
+                        ],
+                        'primaryKeys' => [
+                            'col1',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }
