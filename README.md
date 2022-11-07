@@ -9,7 +9,7 @@ Create configuration in `data/config.json` with:
     - `backend`: one of supported backend: `synapse`, `snowflake`; required
     - `operation`: one of supported operation: `import`; required
     - `operationType`: one of supported operation's type: `full`, `incremental`; required
-    - `source`: one of supported source: `table`, `file`; required
+    - `source`: one of supported source: `workspace`, `file`; required
     - `fileStorage`: one of supported file storage: `abs` (Azure Blob Storage);
       optional, but required if `source` is `file`
     - `columns`: list of columns; required
