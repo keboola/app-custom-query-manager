@@ -81,17 +81,17 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '__temp_DEDUP_',
-                "destTableName ~ rand ~ '_tmp'",
+                "tableName ~ rand ~ '_tmp'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
             'destSchemaName' => new ReplaceToken(
                 Utils::getUniqeId('destSchemaName'),
-                'destSchemaName',
+                'schemaName',
             ),
             'destTableName' => new ReplaceToken(
                 Utils::getUniqeId('destTableName'),
-                'destTableName',
+                'tableName',
             ),
         ];
 

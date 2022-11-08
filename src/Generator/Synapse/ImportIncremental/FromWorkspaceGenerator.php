@@ -56,11 +56,11 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
         $params = [
             'sourceSchemaName' => new ReplaceToken(
                 Utils::getUniqeId('sourceSchemaName'),
-                'schemaName',
+                'sourceSchemaName',
             ),
             'sourceTableName' => new ReplaceToken(
                 Utils::getUniqeId('sourceTableName'),
-                'tableName',
+                'sourceTableName',
             ),
 
             'stageSchemaName' => new ReplaceToken(
@@ -74,17 +74,17 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
-                "destTableName ~ rand ~ '_tmp'",
+                "tableName ~ rand ~ '_tmp'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
             'destSchemaName' => new ReplaceToken(
                 Utils::getUniqeId('destSchemaName'),
-                'destSchemaName',
+                'schemaName',
             ),
             'destTableName' => new ReplaceToken(
                 Utils::getUniqeId('destTableName'),
-                'destTableName',
+                'tableName',
             ),
         ];
 
