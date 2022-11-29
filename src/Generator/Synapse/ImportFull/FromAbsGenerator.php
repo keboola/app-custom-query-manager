@@ -132,7 +132,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         $options = new SynapseImportOptions(
             [],
             false,
-            false,
+            true,
             1,
             SynapseImportOptions::CREDENTIALS_MANAGED_IDENTITY,
         );

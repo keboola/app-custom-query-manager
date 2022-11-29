@@ -132,7 +132,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         $options = new SnowflakeImportOptions(
             [],
             false,
-            false,
+            true,
             1
         );
         // fake destination

@@ -126,8 +126,8 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
         // fake options
         $options = new SynapseImportOptions(
             [],
-            false,
-            false,
+            true,
+            true,
             1
         );
         // fake destination
