@@ -17,6 +17,8 @@ class Replace
     public const TYPE_PREFIX_AS_IDENTIFIER = 3;
     /** identifier with suffix in value */
     public const TYPE_SUFFIX_AS_IDENTIFIER = 4;
+    /** regex in value */
+    public const TYPE_MATCH_AS_VALUE_REGEX = 6;
 
     /**
      * ReplaceToken object in `$params` can specify value purpose:
@@ -122,6 +124,14 @@ class Replace
             if (preg_match('/\b(\w+' . $token->getValue() . ')\b/', $query, $matches) === 1) {
                 $valueInQuery = $quoter::quoteSingleIdentifier($matches[1]);
                 $keyInOutput = sprintf('id(%s)', $token->getReplacement());
+            } else {
+                // not found, return original query
+                return $query;
+            }
+        } elseif ($token->getType() === self::TYPE_MATCH_AS_VALUE_REGEX) {
+            if (preg_match('/\b(' . $token->getValue() . ')\b/', $query, $matches) === 1) {
+                $valueInQuery = $quoter::quote($matches[1]);
+                $keyInOutput = $token->getReplacement();
             } else {
                 // not found, return original query
                 return $query;
