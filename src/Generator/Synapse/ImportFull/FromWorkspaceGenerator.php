@@ -91,6 +91,11 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
                 Utils::getUniqeId('destTableName'),
                 'tableName',
             ),
+            '_timestamp' => new ReplaceToken(
+                '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
+                '_timestamp',
+                Replace::TYPE_MATCH_AS_VALUE_REGEX,
+            ),
         ];
 
         $queries = [];
