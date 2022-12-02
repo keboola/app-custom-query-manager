@@ -73,7 +73,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
-                "tableName ~ rand ~ '_tmp'",
+                "stageTableName ~ rand ~ '_tmp'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
