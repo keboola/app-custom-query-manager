@@ -87,7 +87,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             ),
             'timestamp' => new ReplaceToken(
                 '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
-                'timestamp',
+                'q(timestamp)',
                 Replace::TYPE_MATCH_AS_VALUE_REGEX,
             ),
         ];
