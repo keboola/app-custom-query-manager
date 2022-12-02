@@ -131,7 +131,7 @@ class Replace
         } elseif ($token->getType() === self::TYPE_MATCH_AS_VALUE_REGEX) {
             if (preg_match('/\b(' . $token->getValue() . ')\b/', $query, $matches) === 1) {
                 $valueInQuery = $quoter::quote($matches[1]);
-                $keyInOutput = $token->getReplacement();
+                $keyInOutput = sprintf('q(%s)', $token->getReplacement());
             } else {
                 // not found, return original query
                 return $query;

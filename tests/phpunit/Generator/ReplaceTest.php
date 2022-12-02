@@ -180,7 +180,7 @@ class ReplaceTest extends TestCase
             SQL,
             new ReplaceToken(
                 '\d{4}-\d{2}-\d{2}',
-                'q(timestamp)',
+                'timestamp',
                 Replace::TYPE_MATCH_AS_VALUE_REGEX,
             ),
             new SnowflakeQuote(),
