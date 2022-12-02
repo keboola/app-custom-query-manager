@@ -42,7 +42,7 @@ FILES = ({{ listFiles(sourceFiles) }})",
             "INSERT INTO {{ id(stageSchemaName) }}.{{ id(tableName ~ rand ~ '_tmp') }} (\"column1\", \"column2\") SELECT a.\"column1\",a.\"column2\" FROM (SELECT \"column1\", \"column2\", ROW_NUMBER() OVER (PARTITION BY \"column1\" ORDER BY \"column1\") AS \"_row_number_\" FROM {{ id(stageSchemaName) }}.{{ id(stageTableName) }}) AS a WHERE a.\"_row_number_\" = 1",
             "BEGIN TRANSACTION",
             "TRUNCATE TABLE {{ id(schemaName) }}.{{ id(tableName) }}",
-            "INSERT INTO {{ id(schemaName) }}.{{ id(tableName) }} (\"column1\", \"column2\", \"_timestamp\") (SELECT COALESCE(\"column1\", '') AS \"column1\",COALESCE(\"column2\", '') AS \"column2\",{{ _timestamp }} FROM {{ id(stageSchemaName) }}.{{ id(tableName ~ rand ~ '_tmp') }} AS \"src\")",
+            "INSERT INTO {{ id(schemaName) }}.{{ id(tableName) }} (\"column1\", \"column2\", \"_timestamp\") (SELECT COALESCE(\"column1\", '') AS \"column1\",COALESCE(\"column2\", '') AS \"column2\",{{ timestamp }} FROM {{ id(stageSchemaName) }}.{{ id(tableName ~ rand ~ '_tmp') }} AS \"src\")",
             "DROP TABLE IF EXISTS {{ id(stageSchemaName) }}.{{ id(tableName ~ rand ~ '_tmp') }}",
             "COMMIT",
         ];

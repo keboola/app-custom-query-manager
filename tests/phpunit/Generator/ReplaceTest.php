@@ -180,14 +180,14 @@ class ReplaceTest extends TestCase
             SQL,
             new ReplaceToken(
                 '\d{4}-\d{2}-\d{2}',
-                '_timestamp',
+                'timestamp',
                 Replace::TYPE_MATCH_AS_VALUE_REGEX,
             ),
             new SnowflakeQuote(),
             '{{ ',
             ' }}',
             <<<SQL
-                INSERT INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607" VALUES ({{ _timestamp }})
+                INSERT INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607" VALUES ({{ timestamp }})
             SQL,
         ];
         yield 'test id with other prefix+suffix' => [
