@@ -73,7 +73,7 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             // dedup table (prefix)
             'dedup_stageTableName' => new ReplaceToken(
                 '#__temp_csvimport',
-                "tableName ~ rand ~ '_tmp'",
+                "stageTableName ~ rand ~ '_tmp'",
                 Replace::TYPE_PREFIX_AS_IDENTIFIER,
             ),
 
@@ -84,6 +84,11 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
             'destTableName' => new ReplaceToken(
                 Utils::getUniqeId('destTableName'),
                 'tableName',
+            ),
+            'timestamp' => new ReplaceToken(
+                '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
+                'timestamp',
+                Replace::TYPE_MATCH_AS_VALUE_REGEX,
             ),
         ];
 
@@ -126,8 +131,8 @@ class FromAbsGenerator extends TestCase implements GeneratorInterface
         // fake options
         $options = new SynapseImportOptions(
             [],
-            false,
-            false,
+            true,
+            true,
             1,
             SynapseImportOptions::CREDENTIALS_MANAGED_IDENTITY,
         );

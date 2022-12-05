@@ -174,6 +174,22 @@ class ReplaceTest extends TestCase
                 FROM {{ listFiles(sourceContainerUrls) }}
             SQL,
         ];
+        yield 'test regex value' => [
+            <<<SQL
+                INSERT INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607" VALUES ('2022-11-08')
+            SQL,
+            new ReplaceToken(
+                '\d{4}-\d{2}-\d{2}',
+                'timestamp',
+                Replace::TYPE_MATCH_AS_VALUE_REGEX,
+            ),
+            new SnowflakeQuote(),
+            '{{ ',
+            ' }}',
+            <<<SQL
+                INSERT INTO "stageSchemaName6336e8dda7606"."stageTableName6336e8dda7607" VALUES ({{ q(timestamp) }})
+            SQL,
+        ];
         yield 'test id with other prefix+suffix' => [
             $defaultQuery,
             new ReplaceToken(

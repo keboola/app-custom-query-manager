@@ -91,6 +91,11 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
                 Utils::getUniqeId('destTableName'),
                 'tableName',
             ),
+            'timestamp' => new ReplaceToken(
+                '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',
+                'timestamp',
+                Replace::TYPE_MATCH_AS_VALUE_REGEX,
+            ),
         ];
 
         $queries = [];
@@ -132,7 +137,7 @@ class FromWorkspaceGenerator extends TestCase implements GeneratorInterface
         $options = new SynapseImportOptions(
             [],
             false,
-            false,
+            true,
             1
         );
         // fake destination
